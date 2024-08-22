@@ -1,4 +1,3 @@
-
 // Function to Implement Dropdown Menu
 const dropdownButton = document.getElementById('dropdownButton');
 const dropdownMenu = document.getElementById('dropdownMenu');
@@ -63,6 +62,25 @@ const badgeModal = document.getElementById('badgeModal');
 const badgeInput = document.getElementById('badgeInput');
 let redirectUrl = '';
 
+// Function to get CSRF token from cookies
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// CSRF token
+const csrftoken = getCookie('csrftoken');
+
 // Show modal and store redirect URL
 function showModal(url) {
     redirectUrl = url;
@@ -76,16 +94,16 @@ function hideModal() {
 
 // Event listeners for buttons to show modal
 newDocketBtn.addEventListener('click', function() {
-    showModal('{% url "docketforms" %}');
+    showModal("{% url 'docketforms' %}");
 });
 searchDatabaseBtn.addEventListener('click', function() {
-    showModal('{% url "searchdatabase" %}');
+    showModal("{% url 'searchdatabase' %}");
 });
 casesProgressBtn.addEventListener('click', function() {
-    showModal('{% url "casesProgress" %}');
+    showModal("{% url 'casesProgress' %}");
 });
 commandMessagingBtn.addEventListener('click', function() {
-    showModal('{% url "commandmessaging" %}');
+    showModal("{% url 'commandmessaging' %}");
 });
 
 // Event listener for verify button in modal
@@ -96,19 +114,15 @@ verifyButton.addEventListener('click', function() {
 // Event listener for cancel button in modal
 cancelButton.addEventListener('click', hideModal);
 
-
-
-
 // Function to verify badge number and redirect if correct
 function verifyBadgeNumber() {
     const enteredBadge = badgeInput.value;
-
-    // Send AJAX request to backend to verify the badge number
-    fetch('{% url "verify_badge" %}', {
+    const verifyBadgeUrl = "{% url 'verify_badge' %}"; 
+    fetch(verifyBadgeUrl, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
-            'X-CSRFToken': '{{ csrf_token }}'
+            'X-CSRFToken': csrftoken 
         },
         body: new URLSearchParams({
             'officer_staff_ID': enteredBadge

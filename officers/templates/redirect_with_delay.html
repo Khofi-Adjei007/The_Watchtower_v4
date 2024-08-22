@@ -2,20 +2,156 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Redirecting...</title>
+    <title>Registration Success</title>
     <meta http-equiv="refresh" content="{{ delay_seconds }};url={{ url }}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Registration Success</title>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.1.0/fonts/remixicon.css" rel="stylesheet"/>
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
     {% tailwind_css %}
-</head>
+    <style>
+        /* Custom CSS for the animation */
+        @keyframes scaleUp {
+            0% {
+                transform: scale(0.001) rotate(100deg);
+                opacity: 0.001;
+            }
+            100% {
+                transform: scale(1) rotate(360deg);
+                opacity: 1;
+            }
+        }
 
-<body>
-    <div class="items-center justify-center mx-auto">
-    <p class="text-blue-900 font-bold text-4xl">Accounted Created Successfully</p>
+        @keyframes strokeOffset {
+            from {
+                stroke-dashoffset: 100%;
+            }
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        .success {
+            animation: scaleUp 1s ease-out forwards;
+        }
+        
+        .line {
+            opacity: 0;
+            transform: scale(0.001);
+            animation-fill-mode: forwards;
+        }
+        
+        .line1 { animation: scaleUp 1s ease-out 0.4s forwards; }
+        .line2 { animation: scaleUp 1s ease-out 0.3s forwards; }
+    </style>
+</head>
+<body class="bg-white flex flex-col items-center justify-center min-h-screen">
+
+    <div class="text-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="success" width="300" height="600" viewBox="0 0 101 101" fill="none">
+            <ellipse cx="50.5171" cy="49.9367" rx="11.5213" ry="11.5497" fill="#00AC3E"/>
+            <path fill-rule="evenodd" clip-rule="evenodd" class="checkmark" d="M45.2576 48.604L49.084 52.6483L55.1814 46.1154" stroke="white" stroke-width="2.5"/>
+            <line  class="line1" x1="61.8656" y1="13.4946" x2="58.3004" y2="26.8" stroke="#00AC3E" stroke-width="3" stroke-linecap="round"/>
+            <line  class="line2" x1="84.906" y1="32.622" x2="72.9767" y2="39.5094" stroke="#00AC3E" stroke-width="3" stroke-linecap="round"/>
+            <line  class="line3" x1="87.6729" y1="62.4366" x2="74.3675" y2="58.8715" stroke="#00AC3E" stroke-width="3" stroke-linecap="round"/>
+            <line  class="line4" x1="68.5467" y1="85.4764" x2="61.6593" y2="73.5471" stroke="#00AC3E" stroke-width="3" stroke-linecap="round"/>
+            <line  class="line5" x1="45.1935" y1="75.715" x2="41.6283" y2="89.0205" stroke="#00AC3E" stroke-width="3" stroke-linecap="round"/>
+            <line  class="line6" x1="29.1204" y1="64.8283" x2="17.1911" y2="71.7157" stroke="#00AC3E" stroke-width="3" stroke-linecap="round"/>
+            <line  class="line7" x1="25.4527" y1="45.765" x2="12.1473" y2="42.1998" stroke="#00AC3E" stroke-width="3" stroke-linecap="round"/>
+            <line  class="line8" x1="36.3394" y1="29.6917" x2="29.452" y2="17.7624" stroke="#00AC3E" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+
+        <div class="controls mt-8">
+            <button class="play bg-black text-white px-4 py-2 rounded hover:bg-red-500">Spandolage!</button>
+        </div>
     </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script>
+        var tl = anime.timeline({
+            autoplay: true,
+            loop: true
+        });
+
+        tl.add({
+            targets: '.success',
+            scale: [0.001, 1],
+            rotate: [100, 360],
+            opacity: [0.001, 1],
+            duration: 1000
+        })
+        .add({
+            targets: '.checkmark',
+            duration: 500,
+            easing: 'easeInOutSine',
+            strokeDashoffset: [anime.setDashoffset, 0],
+        }, 200)
+        .add({
+            targets: '.line1',
+            opacity: [0, 1],
+            scale: [0.000, 1],
+            duration: 1000
+        }, 400)
+        .add({
+            targets: '.line2',
+            opacity: [0, 1],
+            scale: [0.001, 1],
+            duration: 1000
+        }, 300)
+        .add({
+            targets: '.line3',
+            opacity: [0, 1],
+            scale: [0.001, 1],
+            duration: 1000
+        }, 400)
+        .add({
+            targets: '.line4',
+            opacity: [0, 1],
+            scale: [0.001, 1],
+            duration: 1000
+        }, 400)
+        .add({
+            targets: '.line5',
+            opacity: [0, 1],
+            scale: [0.001, 1],
+            duration: 1000
+        }, 300)
+        .add({
+            targets: '.line6',
+            opacity: [0, 1],
+            scale: [0.001, 1],
+            duration: 1000
+        }, 400)
+        .add({
+            targets: '.line7',
+            opacity: [0, 1],
+            scale: [0.001, 1],
+            duration: 1000
+        }, 300)
+        .add({
+            targets: '.line8',
+            opacity: [0, 1],
+            scale: [0.001, 1],
+            duration: 1000
+        }, 400)
+        .add({
+            targets: ['.line1', '.line2', '.line3', '.line4', '.line5', '.line6', '.line7', '.line8'],
+            opacity: [1, 0],
+            duration: 300,
+            easing: 'easeInSine',
+        }, '-=300')
+        .add({
+            targets: ['.success'],
+            opacity: [1, 0],
+            delay: 200,
+            duration: 300,
+            easing: 'easeInSine',
+            endDelay: 500
+        }, '-=300');
+
+        document.querySelector('.play').onclick = tl.restart;
+    </script>
+
 </body>
 </html>

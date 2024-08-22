@@ -53,11 +53,14 @@ INSTALLED_APPS = [
     'tailwind',
     'theme',
 ]
-
 TAILWIND_APP_NAME = 'theme'
-
 INTERNAL_IPS = [
     "127.0.0.1",
+]
+
+LOGIN_URL = login_url='/officer_login/'
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
 ]
 
 NPM_BIN_PATH = "C:/Program Files/nodejs/npm.cmd"
