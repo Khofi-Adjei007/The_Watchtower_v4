@@ -21,7 +21,7 @@ from django.views.decorators.http import require_POST
 from django.utils import timezone
 from django.contrib.sessions.models import Session
 
-from .models import NewOfficerRegistration, OfficerLogin, Statement, PDFDocument, Case
+from .models import NewOfficerRegistration, OfficerLogin,Case
 from .forms_and_validations import officerRegistrationsForms, officer_loginForms
 
 
@@ -31,6 +31,15 @@ from .forms_and_validations import officerRegistrationsForms, officer_loginForms
 # Redirection Message after succcesful registrations
 def redirect_with_delay(request, url, delay_seconds=3):
     return render(request, 'redirect_with_delay.html', {'url': url, 'delay_seconds': delay_seconds})
+
+@csrf_protect
+@require_POST
+def verify_badge(request):
+    badge_number = request.POST.get('officer_staff_ID')
+    if NewOfficerRegistration.objects.filter(officer_staff_ID=badge_number).exists():
+        return JsonResponse({'status': 'success'})
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid badge number'})
 
 
 # New Officers Registration Views
@@ -138,3 +147,14 @@ def officer_login(request):
     else:
         form = officer_loginForms()
     return render(request, 'officer_login.html', {'form': form, 'error_message': error_message})
+
+
+@csrf_protect
+def selectPurpose(request):
+    return render(request, 'selectPurpose.html')
+
+
+@csrf_protect
+def docketforms(request):
+    return render(request, 'docketforms.html')
+   

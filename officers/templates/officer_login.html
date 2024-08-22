@@ -1,0 +1,62 @@
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> The Watchtower | Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.1.0/fonts/remixicon.css" rel="stylesheet"/>
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    {% tailwind_css %}
+</head>
+
+<body>
+    <div class="min-h-screen py-44 px-36 bg-gray-900 bg-cover bg-center">
+            
+        <!--Start of Staff ID-->
+        <div class="min-h-10 flex flex-col-2 justify-center">
+            <div class="text-white font-semibold text-center mb-4 text-5xl mt-24">
+                <h1 id="heading_text" class="text-blue-500 font-semibold text-center text-8xl mb-3">Ghana Police</h1>
+                <h1 id="power_slogan">You have the power <br> -Be A Positive Change</h1>
+            </div>
+            
+            <div class="bg-white p-6 rounded-lg shadow-md w-96 ml-40">
+                <div class="flex col-span-2 mb-3">
+                    <img class="h-8 mr-2" src="{% static 'img/download.png' %}" alt="Your Company">
+                    <h1 class="text-2xl font-semibold mb-6"> Provide Credentials</h1>
+                    </div>
+
+                <form method="post">
+                    <div class="mb-5">
+                        {% csrf_token %}
+                    
+                   
+                        <p class="text-red-500 error-message mb-3">{{ error_message }}</p>
+                   
+                        {% for field in form %}
+                        <div class="py-2">        
+                            <label for="{{ field.name }}" class="block text-gray-700">{{ field.label }}<span class="text-red-700 ml-1">*</span></label>                       
+                            <input type="{{ field.field.widget.input_type }}" id="{{ field.name }}" name="{{ field.name }}" placeholder="{{ field.label }}" class="w-full px-3 py-2 mt-1 rounded-md focus:outline-none focus:ring focus:ring-blue-500 focus:border-blue-500">
+                        </div>                        
+                        {% endfor %} 
+                        
+                        <div class="col-span-2 mt-4">
+                            <button type="submit" class="w-full px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600">Login</button>
+                        </div>
+
+
+                    <div class="justify-center items-center  mt-12 text-center">
+                        <a href="{% url 'officer_registrations' %}">
+                        <button type="button" name="create_account" class="bg-blue-600 p-3 font-semibold text-white text-center rounded-md divide-y divide-gray-400 focus:outline-none focus:ring focus:ring-blue-500">Create Account</button>
+                        </a>
+                    </div>
+                </form>
+
+
+            </div>
+        </div>
+        <!--End of Staff ID-->
+    </div>
+</body>
+</html>
