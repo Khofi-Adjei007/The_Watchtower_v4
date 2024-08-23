@@ -19,6 +19,11 @@ urlpatterns = [
     path('docketforms/CaseStep3Form/', views.CaseStep3Form, name='CaseStep3Form'),
     path('searchdatabase/', views.searchdatabase, name='searchdatabase'),
     path('casesProgress/', views.casesProgress, name='casesProgress'),
+    path('selectPurpose/', views.selectPurpose, name='selectPurpose'),
+    path('docketforms/', views.docketforms, name='docketforms'),
+    path('searchdatabase/', views.searchdatabase, name='searchdatabase'),
+    path('casesProgress/', views.casesProgress, name='casesProgress'),
+    path('commandmessaging/', views.commandmessaging, name='commandmessaging'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

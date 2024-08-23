@@ -133,41 +133,27 @@ def officer_logout(request):
     return redirect(reverse('officer_login'))
 
 
-# officer login views
-@csrf_protect
-def officer_login(request):
-    error_message = ''
-    if request.method == 'POST':
-        form = officer_loginForms(request.POST)
-        if form.is_valid():
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
-            user = authenticate(username=username, password=password)
-            if user is not None:
-                login(request, user)
-                request.session['user_id'] = user.id
-                request.session['username'] = user.username
-                if hasattr(user, 'newofficerregistration'):
-                    request.session['officer_staff_ID'] = user.newofficerregistration.officer_staff_ID
-                    request.session['officer_current_rank'] = user.newofficerregistration.officer_current_rank
-                return redirect('selectPurpose')
-            else:
-                error_message = 'Invalid username or password'
-        else:
-            error_message = 'Invalid form data'
-    else:
-        form = officer_loginForms()
-    return render(request, 'officer_login.html', {'form': form, 'error_message': error_message})
-
-
-@csrf_protect
-def selectPurpose(request):
-    return render(request, 'selectPurpose.html')
-
-
+@login_required(login_url='officer_login')
 @csrf_protect
 def docketforms(request):
-    return render(request, 'docketforms.html')
+    form_step1 = CaseStep1Form()
+    form_step2 = CaseStep2Form()
+    form_step3 = CaseStep3Form()
+
+    if request.method == 'POST':
+        form_step1 = CaseStep1Form(request.POST)
+        if form_step1.is_valid():
+            # Save the valid form data into the session or process it
+            request.session['form_step1_data'] = form_step1.cleaned_data
+            return redirect('next_step_view')  # Adjust the URL for the next step
+        
+    # Render the form in the template
+    return render(request, 'docketforms.html', {
+        'form_step1': form_step1,
+        'form_step2': form_step2,
+        'form_step3': form_step3,
+    })
+
 
 
 @csrf_exempt
