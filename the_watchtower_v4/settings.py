@@ -20,11 +20,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # URL to use when referring to static files
 STATIC_URL = '/static/'
 
-# Directories to look for additional static files
+
+# The directory where static files will be collected
+STATIC_ROOT = os.path.join(BASE_DIR, 'theme/static')
+
+
+# Directories to look for additional static files during development
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),  # Main static directory
-    os.path.join(BASE_DIR, 'theme/static'),
-    ]
+]
 
 
 # Quick-start development settings - unsuitable for production
@@ -37,6 +41,11 @@ SECRET_KEY = 'django-insecure-3tzc$7-h_e1b@4q650^%98xj(9=muq4l$pf&_(*)5r1jm8m!(*
 DEBUG = True
 
 ALLOWED_HOSTS = []
+
+
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 
 # Application definition

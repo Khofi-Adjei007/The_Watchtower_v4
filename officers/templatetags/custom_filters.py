@@ -3,6 +3,15 @@ from datetime import date
 register = template.Library()
 from datetime import datetime
 
+import os
+import django
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'the_watchtower_v4.settings')
+django.setup()
+
+# Now you can import and use Django components
+
+
 @register.filter(name='in_list')
 def in_list(value, arg):
     """Check if value is in the provided comma-separated list."""

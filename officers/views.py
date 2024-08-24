@@ -28,14 +28,9 @@ from .forms_and_validations import officerRegistrationsForms, officer_loginForms
 
 
 
-
-
-
 # Redirection Message after succcesful registrations
 def redirect_with_delay(request, url, delay_seconds=3):
     return render(request, 'redirect_with_delay.html', {'url': url, 'delay_seconds': delay_seconds})
-
-
 
 
 # New Officers Registration Views
@@ -113,14 +108,18 @@ def selectPurpose(request):
     return render(request, 'selectPurpose.html')
 
 # Route to Search Database
+@login_required(login_url='officer_login')
 def searchdatabase(request):
     return render(request, 'searchdatabase.html')
 
+
 # Route to get cases and thier progress
+@login_required(login_url='officer_login')
 def casesProgress(request):
     return render(request, 'casesProgress.html')
 
 # Route to command messaging
+@login_required(login_url='officer_login')
 def commandmessaging(request):
     return render(request, 'commandmessaging.html')
 
@@ -133,26 +132,40 @@ def officer_logout(request):
     return redirect(reverse('officer_login'))
 
 
+
 @login_required(login_url='officer_login')
 @csrf_protect
 def docketforms(request):
+    # Initial step view logic, this could be the first step in the multi-step process
     form_step1 = CaseStep1Form()
     form_step2 = CaseStep2Form()
     form_step3 = CaseStep3Form()
 
     if request.method == 'POST':
-        form_step1 = CaseStep1Form(request.POST)
-        if form_step1.is_valid():
-            # Save the valid form data into the session or process it
-            request.session['form_step1_data'] = form_step1.cleaned_data
-            return redirect('next_step_view')  # Adjust the URL for the next step
-        
-    # Render the form in the template
+        if 'form_step1' in request.POST:
+            form_step1 = CaseStep1Form(request.POST)
+            if form_step1.is_valid():
+                request.session['form_step1_data'] = form_step1.cleaned_data
+                return redirect('CaseStep2Form')  # Redirect to the next step URL
+
+        elif 'form_step2' in request.POST:
+            form_step2 = CaseStep2Form(request.POST)
+            if form_step2.is_valid():
+                request.session['form_step2_data'] = form_step2.cleaned_data
+                return redirect('CaseStep2Form')  # Redirect to the next step URL
+
+        elif 'form_step3' in request.POST:
+            form_step3 = CaseStep3Form(request.POST)
+            if form_step3.is_valid():
+                request.session['form_step3_data'] = form_step3.cleaned_data
+                return redirect('final_view')  # Redirect to the final view or summary page
+
     return render(request, 'docketforms.html', {
         'form_step1': form_step1,
         'form_step2': form_step2,
         'form_step3': form_step3,
     })
+
 
 
 
@@ -165,7 +178,7 @@ def verify_badge(request):
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid badge number'})
     
-
+@login_required(login_url='officer_login')
 def CaseStep1View(request):
     if request.method == 'POST':
         form_step1 = CaseStep1Form(request.POST)
@@ -248,7 +261,7 @@ def CaseStep1View(request):
     }
     return render(request, 'docketforms.html', context)
 
-
+@login_required(login_url='officer_login')
 def CaseStep2View(request):
     if request.method == 'POST':
         print(f"Request POST: {request.POST}")
@@ -262,7 +275,7 @@ def CaseStep2View(request):
 
     return render(request, 'step2.html', {'form_step2': form_step2})
 
-
+@login_required(login_url='officer_login')
 def CaseStep3View(request):
     if request.method == 'POST':
         form = CaseStep3Form(request.POST, request.FILES or None) 

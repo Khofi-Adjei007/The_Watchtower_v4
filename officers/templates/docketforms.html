@@ -57,19 +57,25 @@
             <div id="stepGroup1" class="step-group" data-step-group="1">
             <div class="mb-8 bg-green-200 p-3">
 
-            <form method="post" action="{% url 'CaseStep1Form' %}" id="form_step1_submit">
+            <form method="post" action="{% url 'CaseStep1Form' %}" id="form_step1_submit"  novalidate>
             <div class="grid grid-cols-2 gap-6 sm:grid-cols-1">
             {% csrf_token %}
                 
-            {% if form_step1.errors %}
-            <div class="text-red-600">
-                {% for field in form_step1 %}
-                    {% if field.errors %}
-                        <div>{{ field.label }}: {{ field.errors }}</div>
-                    {% endif %}
-                {% endfor %}
-            </div>
-        {% endif %}
+                    {% if form_step1.errors %}
+                    <div class="text-red-600">
+                        {% for field in form_step1 %}
+                            {% if field.errors %}
+                                <div>
+                                    <strong>{{ field.label }}:</strong>
+                                    {% for error in field.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
 
                 <!-- General Case Information -->
                 <div class="mt-4">
@@ -233,9 +239,10 @@
                     <button type="submit" id="continueButton" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 px-4 rounded-md shadow-sm">Continue</button>
                 </div>
                 </div>
+                
                 </form>
                 </div>    
-        </div>
+            </div>
         
          
         
@@ -370,14 +377,7 @@
                 <!-- Witness Limit Message -->
                 <p id="witnessLimitMessage" class="hidden text-red-600 text-sm mt-2"></p>
                 </div>  
-                <div class="bg-gray-300 mt-6 mb-4">
-                    <div class="flex justify-between">
-                        <!-- Back Button -->
-                        <button type="button" id="backButton" class="bg-gray-600 hover:bg-gray-500 text-white font-semibold py-2 px-4 rounded-md shadow-sm">Back</button>
-                        <!-- Continue Button -->
-                        <button type="submit" id="continueButton" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 px-4 rounded-md shadow-sm">Continue</button>
-                    </div>
-                    </div>
+             
             </form>
         </div>
           
@@ -495,162 +495,75 @@
             </div>
         </div>
             </form>
-            </div>
-
-
-        
+            </div> 
     </div> 
     </div>
     </div>
-
-
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-    const steps = document.querySelectorAll('#stepper li');
-    const continueButton = document.getElementById('continueButton');
-    const backButton = document.getElementById('backButton');
-    const stepGroups = document.querySelectorAll('.step-group');
-    let currentStep = 0;
-
+document.addEventListener('DOMContentLoaded', function() {
     // Function to control the visibility of the victim toggle
     const victimToggle = () => {
         const sameVictimRadio = document.getElementById('sameVictim');
         const differentVictimRadio = document.getElementById('differentVictim');
         const victimInfoForm = document.getElementById('victimInfoForm');
+        const victimFields = [
+            'victim_physical_address',
+            'victim_name',
+            'victim_contact',
+            'victim_occupation',
+            'victim_date_of_birth'
+        ];
 
         sameVictimRadio.addEventListener('click', function() {
             victimInfoForm.classList.add('hidden');
+            victimFields.forEach(field => {
+                document.querySelector(`[name="${field}"]`).removeAttribute('required');
+            });
         });
 
         differentVictimRadio.addEventListener('click', function() {
             victimInfoForm.classList.remove('hidden');
+            victimFields.forEach(field => {
+                document.querySelector(`[name="${field}"]`).setAttribute('required', 'required');
+            });
         });
     };
 
     // Initialize victim toggle functionality
     victimToggle();
 
-    // Function to show the current step group and hide others
-    const showCurrentStepGroup = () => {
-        stepGroups.forEach((group, index) => {
-            if (index === currentStep) {
-                group.classList.remove('hidden');
-            } else {
-                group.classList.add('hidden');
-            }
-        });
-    };
+    // Witness box and addition
+    let witnessCount = 0;
+    const maxWitnesses = 5;
 
-    // Initial setup to show the first group and set the first step to red
-    steps[currentStep].classList.add('text-red-600', 'dark:text-red-500');
-    steps[currentStep].querySelector('span').classList.add('border-red-600', 'dark:border-red-500');
-    showCurrentStepGroup();
+    document.getElementById('addWitnessButton').addEventListener('click', function() {
+        if (witnessCount < maxWitnesses) {
+            witnessCount++;
 
-    continueButton.addEventListener('click', function() {
-        // Hide the current step group
-        const currentGroup = document.querySelector(`[data-step-group="${currentStep + 1}"]`);
-        if (currentGroup) {
-            currentGroup.classList.add('hidden');
-        }
-
-        // Move to the next step
-        currentStep++;
-
-        // Ensure we do not go beyond the available steps
-        if (currentStep < steps.length) {
-            // Show the next step group
-            showCurrentStepGroup();
-
-            // Update the step indicator
-            steps.forEach((step, index) => {
-                if (index === currentStep) {
-                    step.classList.add('text-red-600', 'dark:text-red-500'); // Active step in red
-                    step.querySelector('span').classList.add('border-red-600', 'dark:border-red-500');
-                } else {
-                    step.classList.remove('text-red-600', 'dark:text-red-500');
-                    step.classList.add('text-gray-500', 'dark:text-gray-400');
-                    step.querySelector('span').classList.remove('border-red-600', 'dark:border-red-500');
-                    step.querySelector('span').classList.add('border-gray-500', 'dark:border-gray-400');
-                }
-            });
-
-            // Change button text on the last step
-            if (currentStep === steps.length - 1) {
-                continueButton.textContent = 'Register Docket';
-            }}
-
-        // Disable button if there are no more steps
-        if (currentStep >= steps.length) {
-            continueButton.disabled = true;
-            continueButton.classList.add('opacity-50', 'cursor-not-allowed');
-        }});
-
-    // Back button functionality
-    backButton.addEventListener('click', function() {
-        if (currentStep > 0) {
-            // Hide the current step group
-            const currentGroup = document.querySelector(`[data-step-group="${currentStep + 1}"]`);
-            if (currentGroup) {
-                currentGroup.classList.add('hidden');}
-
-            // Move to the previous step
-            currentStep--;
-
-            // Show the previous step group
-            showCurrentStepGroup();
-
-            // Update the step indicator
-            steps.forEach((step, index) => {
-                if (index === currentStep) {
-                    step.classList.add('text-red-600', 'dark:text-red-500'); // Active step in red
-                    step.querySelector('span').classList.add('border-red-600', 'dark:border-red-500');
-                } else {
-                    step.classList.remove('text-red-600', 'dark:text-red-500');
-                    step.classList.add('text-gray-500', 'dark:text-gray-400');
-                    step.querySelector('span').classList.remove('border-red-600', 'dark:border-red-500');
-                    step.querySelector('span').classList.add('border-gray-500', 'dark:border-gray-400');
-                }
-            });
-
-            // Update button text if going back from the last step
-            if (currentStep < steps.length - 1) {
-                continueButton.textContent = 'Continue';
-                continueButton.disabled = false;
-                continueButton.classList.remove('opacity-50', 'cursor-not-allowed');
-            }
+            // Clone the hidden witness box and make it visible
+            const witnessContainer = document.getElementById('witnessContainer');
+            const newWitness = document.getElementById('hiddenWitness').cloneNode(true);
+            newWitness.id = `witness${witnessCount}`; // Give each witness box a unique ID
+            newWitness.classList.remove('hidden');
+            
+            // Update the label and placeholder text to reflect the new witness
+            newWitness.querySelector('label').textContent = `Witness ${witnessCount} Statement`;
+            newWitness.querySelector('textarea').placeholder = `Please provide a detailed account of the incident by witness ${witnessCount}.`;
+            
+            // Append the new witness box to the witness container
+            witnessContainer.appendChild(newWitness);
+        } else {
+            // Display the message when the limit is reached
+            const messageElement = document.getElementById('witnessLimitMessage');
+            messageElement.textContent = "Witness limit reached.";
+            messageElement.classList.remove('hidden');
         }
     });
 });
 
 
 
-//Witness box and addition
-let witnessCount = 0;
-const maxWitnesses = 5;
 
-document.getElementById('addWitnessButton').addEventListener('click', function() {
-    if (witnessCount < maxWitnesses) {
-        witnessCount++;
-
-        // Clone the hidden witness box and make it visible
-        const witnessContainer = document.getElementById('witnessContainer');
-        const newWitness = document.getElementById('hiddenWitness').cloneNode(true);
-        newWitness.id = `witness${witnessCount}`; // Give each witness box a unique ID
-        newWitness.classList.remove('hidden');
-        
-        // Update the label and placeholder text to reflect the new witness
-        newWitness.querySelector('label').textContent = `Witness ${witnessCount} Statement`;
-        newWitness.querySelector('textarea').placeholder = `Please provide a detailed account of the incident by witness ${witnessCount}.`;
-        
-        // Append the new witness box to the witness container
-        witnessContainer.appendChild(newWitness);
-    } else {
-        // Display the message when the limit is reached
-        const messageElement = document.getElementById('witnessLimitMessage');
-        messageElement.textContent = "Witness limit reached.";
-        messageElement.classList.remove('hidden');
-    }
-    });
     </script>
 </body>
 </html>

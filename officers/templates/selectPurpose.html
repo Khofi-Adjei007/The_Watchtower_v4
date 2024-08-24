@@ -75,10 +75,6 @@
                                 </span>
                             </button>
                         </div>
-                        
-                        
-
-        
                     </div>
                     
                 </div>
@@ -86,9 +82,17 @@
             <!--Base Bar and Content-->
                 <div class="bg-blue-950 justify-center items-center rounded-md w-full h-auto p-2 text-gray-100 flex flex-row shadow-lg">
                 <div class="rounded-md ring-2 ring-gray-300 p-2 flex items-center">
-                <img class="mr-2 w-10 h-10 p-1 rounded-full ring-2 ring-gray-300 dark:ring-gray-500" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSmQ0VYN539qcIPRU9O0eizGRPKEVg6rRL1IHZUKHMIZJjr06NjlH9vJaxmPlFf2rABcdo&usqp=CAUg" alt="Bordered avatar">
+                    {% if user.is_authenticated %}
+                    <img class="mr-2 w-10 h-10 p-1 rounded-full ring-2 ring-gray-300 dark:ring-gray-500"
+                         src="{{ user.profile.profile_image.url }}" 
+                         alt="{{ user.username }}'s avatar">
+                {% else %}
+                    <img class="mr-2 w-10 h-10 p-1 rounded-full ring-2 ring-gray-300 dark:ring-gray-500"
+                         src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSmQ0VYN539qcIPRU9O0eizGRPKEVg6rRL1IHZUKHMIZJjr06NjlH9vJaxmPlFf2rABcdo&usqp=CAUg" 
+                         alt="Default avatar">
+                {% endif %}
+                
                 <div class="flex flex-col">
-
                 {% if user.is_authenticated %}
                 <span class="font-semibold">{{ user.newofficerregistration.username }}</span>
                 <span class="text-xs">{{ user.newofficerregistration.officer_current_rank }}</span>
@@ -113,9 +117,7 @@
                     <!--End - User DropDown menu-->
                     </div>
                     </div>
-                
                 <!--Base Bar and Content-->
-
                 </div>
             </div>
             <!--End of Staff ID-->
@@ -144,7 +146,7 @@
     </div>
     
     
-    <script>
+<script>
 // Function to Implement Dropdown Menu
 const dropdownButton = document.getElementById('dropdownButton');
 const dropdownMenu = document.getElementById('dropdownMenu');
