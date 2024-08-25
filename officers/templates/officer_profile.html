@@ -1,0 +1,140 @@
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Officer Profile | The Watchtower</title>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.1.0/fonts/remixicon.css" rel="stylesheet"/>
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    {% tailwind_css %}
+</head>
+
+<body>
+    <div class="min-h-screen py-14 px-36 bg-gray-900 bg-cover bg-center">
+        <!--Start of Staff ID-->
+        <div class="min-h-10 flex flex-col-2 justify-center">
+            <div class="bg-white rounded-lg mx-auto justify-center shadow-md w-[50%]">
+
+                <div class="mx-auto justify-center text-gray-950 p-6 w-[80%] h-auto">
+                    <div class="flex items-center">
+                        <!-- Profile Photo -->
+                        <div class="w-20 h-20 rounded-full overflow-hidden border-4 border-gray-700">
+                        <img src="{{ officer_profile.officer_profile_image.url }}" alt="User Photo" class="w-full h-full object-cover">
+                        </div>
+                        <!-- User Information -->
+                        <div class="ml-4">
+                            <h2 class="text-2xl font-bold">{{ officer_profile.first_name }} {{ officer_profile.last_name }}</h2>
+                            <h3 class="text-sm font-semibold">{{ officer_profile.officer_current_rank }} | {{ officer_profile.officer_current_station }} | {{ officer_profile.officer_operations_department}}</h3>
+                                                <!-- Star Rating -->
+                            <div class="flex mt-2">
+                                <svg class="w-4 h-4 text-yellow-500" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 17.27L18.18 21 16.54 14.42 22 9.24 15.34 8.63 12 2 8.66 8.63 2 9.24 7.46 14.42 5.82 21z"/>
+                                </svg>
+                                <svg class="w-4 h-4 text-yellow-500" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 17.27L18.18 21 16.54 14.42 22 9.24 15.34 8.63 12 2 8.66 8.63 2 9.24 7.46 14.42 5.82 21z"/>
+                                </svg>
+                                <svg class="w-4 h-4 text-yellow-500" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 17.27L18.18 21 16.54 14.42 22 9.24 15.34 8.63 12 2 8.66 8.63 2 9.24 7.46 14.42 5.82 21z"/>
+                                </svg>
+                                <svg class="w-4 h-4 text-yellow-500" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 17.27L18.18 21 16.54 14.42 22 9.24 15.34 8.63 12 2 8.66 8.63 2 9.24 7.46 14.42 5.82 21z"/>
+                                </svg>
+                                <svg class="w-4 h-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 17.27L18.18 21 16.54 14.42 22 9.24 15.34 8.63 12 2 8.66 8.63 2 9.24 7.46 14.42 5.82 21z"/>
+                                </svg>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <div>
+                    <hr class="my-4 border-gray-100 py-3">
+                    <p class="mb-2 mr-6 flex flex-row"><strong class="mr-5">Phone :</strong> <i class="ri-phone-fill mr-3"></i>{{ officer_profile.phone_contact }}</p>
+                    <p class="mb-2"><strong class="mr-6">Email :</strong> <i class="ri-mail-fill mr-3"></i> {{ officer_profile.email }}</p>
+                    <p class="mb-2"><strong class="mr-4">Joined :</strong> <i class="ri-calendar-fill mr-3"></i>{{ officer_profile.officer_date_of_birth }}</p>
+                    <div class="bg-white shadow rounded-lg p-4 mt-6">
+                        <div class="flex justify-between border-b border-gray-200 mb-4">
+                            <button id="overview-tab" class="px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100">Overview</button>
+                            <button id="activities-tab" class="px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100">Activities</button>
+                            <button id="notifications-tab" class="px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100">Notifications</button>
+                        </div>
+                        
+                        <div id="overview-section" class="section-content">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="bg-blue-100 text-blue-900 p-4 rounded-lg">
+                                    <h4 class="text-lg font-bold">Logged Dockets</h4>
+                                    <p class="text-xl ml-6 mt-2 items-center font-bold">43</p>
+                                </div>
+                                <div class="bg-green-100 text-green-900 p-4 rounded-lg">
+                                    <h4 class="text-lg font-bold">Arrests Made</h4>
+                                    <p class="text-xl ml-6 mt-2 items-center font-bold">56</p>
+                                </div>
+                                <div class="bg-yellow-100 text-yellow-900 p-4 rounded-lg">
+                                    <h4 class="text-lg font-bold">Successful Duties</h4>
+                                    <p class="text-xl ml-6 mt-2 items-center font-bold">207</p>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div id="activities-section" class="section-content hidden">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Activities</h3>
+                            <ul class="list-disc pl-5 space-y-2">
+                                <li>{{ officer_profile.activity_1 }}</li>
+                                <li>{{ officer_profile.activity_2 }}</li>
+                                <li>{{ officer_profile.activity_3 }}</li>
+                                <!-- Add more activities as needed -->
+                            </ul>
+                        </div>
+                    
+                        <div id="notifications-section" class="section-content hidden">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Notifications</h3>
+                            <ul class="list-disc pl-5 space-y-2">
+                                <li>Notification 1: {{ officer_profile.notification_1 }}</li>
+                                <li>Notification 2: {{ officer_profile.notification_2 }}</li>
+                                <li>Notification 3: {{ officer_profile.notification_3 }}</li>
+                                <!-- Add more notifications as needed -->
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    
+                    </div>
+                    <!-- Add more fields as needed -->
+                </div>
+                
+
+            <!--Base Bar and Content-->
+                <div class="bg-blue-950 justify-center items-center rounded-md w-full h-auto p-2 text-gray-100 flex flex-row">
+                        <a href="{% url 'selectPurpose' %}" class="bg-red-500 hover:bg-red-600 text-white font-bold p-3 rounded-full flex items-center">
+                            <i class="ri-home-4-line w-6 h-6 text-2xl"></i>
+                        </a>
+                </div>
+                <!--Base Bar and Content-->
+                </div>
+            </div>
+            <!--End of Staff ID-->
+    </div>
+<script>
+     document.getElementById('overview-tab').addEventListener('click', function() {
+        showSection('overview-section');
+    });
+
+    document.getElementById('activities-tab').addEventListener('click', function() {
+        showSection('activities-section');
+    });
+
+    document.getElementById('notifications-tab').addEventListener('click', function() {
+        showSection('notifications-section');
+    });
+
+    function showSection(sectionId) {
+        const sections = document.querySelectorAll('.section-content');
+        sections.forEach(section => {
+            section.classList.add('hidden');
+        });
+        document.getElementById(sectionId).classList.remove('hidden');
+    }
+</script>
+</body>
+</html>

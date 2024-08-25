@@ -1,16 +1,7 @@
 from django import template
-from datetime import date
+from datetime import date, datetime
+
 register = template.Library()
-from datetime import datetime
-
-import os
-import django
-
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'the_watchtower_v4.settings')
-django.setup()
-
-# Now you can import and use Django components
-
 
 @register.filter(name='in_list')
 def in_list(value, arg):
@@ -22,10 +13,9 @@ def startswith(value, arg):
     """Usage: {% if value|startswith:"arg" %}"""
     return value.startswith(arg)
 
-
-
 @register.filter
 def calculate_age(birth_date):
+    """Calculate age from birth date."""
     if not birth_date:
         return 'N/A'
     
@@ -41,4 +31,3 @@ def calculate_age(birth_date):
         return age
     else:
         return 'N/A'
-

@@ -2,6 +2,9 @@ import re
 import string
 import uuid
 from datetime import datetime
+from django.utils import timezone
+from datetime import datetime
+import pytz
 
 
 from django import forms
@@ -168,38 +171,8 @@ class officer_loginForms(forms.Form):
 
 #Start of 3-Stepper Forms Validation logics
 class CaseStep1Form(forms.Form):
-    case_ID = forms.CharField(
-        label="Case ID",
-        max_length=100,
-        required=True,  # Ensure this is required in case you want to enforce it
-        widget=forms.TextInput(attrs={
-            'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
-            'placeholder': 'Auto-generated',
-            'readonly': 'readonly'  # Consider 'readonly' instead of 'disabled' if you want the value to be sent with the form
-        })
-    )
 
-    def __init__(self, *args, **kwargs):
-        super(CaseStep1Form, self).__init__(*args, **kwargs)
-        # Generate or retrieve the initial case ID
-        self.fields['case_ID'].initial = kwargs.get('initial', {}).get('case_ID', str(uuid.uuid4()))
-
-    def clean_case_ID(self):
-        case_ID = self.cleaned_data.get('case_ID')
-        if not case_ID:
-            raise ValidationError("Case ID cannot be empty.")
-        # Ensure the case ID is unique
-        if Case.objects.filter(case_ID=case_ID).exists():
-            raise ValidationError("Case ID already exists. Please reload the form.")
-        return case_ID
-
-    def save(self):
-        # Save the new Case instance
-        new_docket = Case(case_ID=self.cleaned_data['case_ID'])
-        new_docket.save()
-        return new_docket
-
-    case_title = forms.CharField(
+    Case_Title = forms.CharField(
         required=False,
         max_length=250,
         label="Case Title/Description",
@@ -244,12 +217,24 @@ class CaseStep1Form(forms.Form):
 
     def clean_date_time_of_report(self):
         date_time_of_report = self.cleaned_data.get('date_time_of_report')
+    
         if not date_time_of_report:
             raise ValidationError("Date & Time of Report is required.")
-        if date_time_of_report > datetime.now():
+        
+        # Get the current time as timezone-aware
+        now = timezone.now()
+        
+        # Make date_time_of_report timezone-aware if it's naive
+        if timezone.is_naive(date_time_of_report):
+            local_timezone = timezone.get_current_timezone()
+            date_time_of_report = local_timezone.localize(date_time_of_report)
+        
+        # Compare report time with the current time
+        if date_time_of_report > now:
             raise ValidationError("The report date cannot be in the future.")
+        
         return date_time_of_report
-
+    
     complainant_name = forms.CharField(
         label="Enter Complainant Name",
         max_length=100,
@@ -635,11 +620,13 @@ class CaseStep1Form(forms.Form):
 
     def clean_victim_occupation(self):
         victim_occupation = self.cleaned_data.get('victim_occupation')
+        print(f"Validating victim occupation: '{victim_occupation}'")  # Debugging line
         if not victim_occupation:
             raise forms.ValidationError("Occupation cannot be empty.")
         elif not re.match(r'^[a-zA-Z ]*$', victim_occupation):  # Allow spaces in occupations
             raise forms.ValidationError("Enter a valid occupation (letters and spaces only).")
         return victim_occupation
+
 
     victim_date_of_birth = forms.DateField(
         label="Victim Date of Birth",

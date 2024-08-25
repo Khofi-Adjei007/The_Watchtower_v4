@@ -40,10 +40,14 @@ def officer_registrations(request):
         form = officerRegistrationsForms(request.POST, request.FILES)
         if form.is_valid():
             form_data = form.cleaned_data
-            user, created = User.objects.get_or_create(username=form_data['username'], email=form_data['email'])
+            user, created = User.objects.get_or_create(username=form_data['username'], defaults={'email': form_data['email']})
+
             if created:
                 user.set_password(form_data['password'])
                 user.save()
+            else:
+                messages.error(request, 'A user with this username already exists.')
+                return render(request, 'officer_registrations.html', {"form": form})
 
             NewOfficerRegistration.objects.create(
                 user=user,
@@ -67,9 +71,10 @@ def officer_registrations(request):
             )
 
             messages.success(request, 'Registration successful!')
-            return redirect_with_delay(request, reverse('officer_login'), delay_seconds=2)
+            return redirect(reverse('officer_login'))
     else:
         form = officerRegistrationsForms()
+
     return render(request, 'officer_registrations.html', {"form": form})
 
 
@@ -86,8 +91,7 @@ def officer_login(request):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-                request.session['user_id'] = user.id
-                request.session['username'] = user.username
+                # Optionally store user-related data in session
                 if hasattr(user, 'newofficerregistration'):
                     request.session['officer_staff_ID'] = user.newofficerregistration.officer_staff_ID
                     request.session['officer_current_rank'] = user.newofficerregistration.officer_current_rank
@@ -99,7 +103,6 @@ def officer_login(request):
     else:
         form = officer_loginForms()
     return render(request, 'officer_login.html', {'form': form, 'error_message': error_message})
-
 
 # Home Selector
 @login_required(login_url='officer_login')
@@ -132,33 +135,46 @@ def officer_logout(request):
     return redirect(reverse('officer_login'))
 
 
+@login_required(login_url='officer_login')
+def officer_profile(request):
+    user = request.user  # Get the currently logged-in user
+    officer_profile = user.newofficerregistration
+    return render(request, 'officer_profile.html', {'officer_profile': officer_profile})
+
+
 
 @login_required(login_url='officer_login')
 @csrf_protect
 def docketforms(request):
-    # Initial step view logic, this could be the first step in the multi-step process
-    form_step1 = CaseStep1Form()
-    form_step2 = CaseStep2Form()
-    form_step3 = CaseStep3Form()
-
     if request.method == 'POST':
         if 'form_step1' in request.POST:
             form_step1 = CaseStep1Form(request.POST)
             if form_step1.is_valid():
                 request.session['form_step1_data'] = form_step1.cleaned_data
-                return redirect('CaseStep2Form')  # Redirect to the next step URL
+                return redirect('CaseStep2View')
+            form_step2 = CaseStep2Form()  # Initialize other forms as empty
 
         elif 'form_step2' in request.POST:
             form_step2 = CaseStep2Form(request.POST)
             if form_step2.is_valid():
                 request.session['form_step2_data'] = form_step2.cleaned_data
-                return redirect('CaseStep2Form')  # Redirect to the next step URL
+                return redirect('CaseStep3View')  # Redirect to the next step URL
+            form_step1 = CaseStep1Form()  # Initialize other forms as empty
+            form_step3 = CaseStep3Form()
 
         elif 'form_step3' in request.POST:
             form_step3 = CaseStep3Form(request.POST)
             if form_step3.is_valid():
                 request.session['form_step3_data'] = form_step3.cleaned_data
                 return redirect('final_view')  # Redirect to the final view or summary page
+            form_step1 = CaseStep1Form()  # Initialize other forms as empty
+            form_step2 = CaseStep2Form()
+
+    else:
+        # Initialize forms as empty when GET request
+        form_step1 = CaseStep1Form()
+        form_step2 = CaseStep2Form()
+        form_step3 = CaseStep3Form()
 
     return render(request, 'docketforms.html', {
         'form_step1': form_step1,
@@ -172,11 +188,16 @@ def docketforms(request):
 @csrf_exempt
 @require_POST
 def verify_badge(request):
-    badge_number = request.POST.get('officer_staff_ID')
-    if NewOfficerRegistration.objects.filter(officer_staff_ID=badge_number).exists():
-        return JsonResponse({'status': 'success'})
+    if request.user.is_authenticated:
+        badge_number = request.POST.get('officer_staff_ID')
+        # Compare the badge number with the logged-in user's badge number
+        if request.user.newofficerregistration.officer_staff_ID == badge_number:
+            return JsonResponse({'status': 'success'})
+        else:
+            return JsonResponse({'status': 'error', 'message': 'Invalid badge number'})
     else:
-        return JsonResponse({'status': 'error', 'message': 'Invalid badge number'})
+        return JsonResponse({'status': 'error', 'message': 'User not authenticated'})
+
     
 @login_required(login_url='officer_login')
 def CaseStep1View(request):
@@ -187,7 +208,8 @@ def CaseStep1View(request):
             cleaned_data = form_step1.cleaned_data
 
             # Store form data in session
-            request.session['case_title'] = cleaned_data.get('case_title')
+            request.session['case_ID'] = cleaned_data.get('case_ID')
+            request.session['Case_Title'] = cleaned_data.get('case_title')
             request.session['date_time_of_incident'] = cleaned_data.get('date_time_of_incident')
             request.session['date_time_of_report'] = cleaned_data.get('date_time_of_report')
 
@@ -217,6 +239,7 @@ def CaseStep1View(request):
                 request.session['victim_digital_address'] = cleaned_data.get('complainant_digital_address')
                 request.session['victim_occupation'] = cleaned_data.get('complainant_occupation')
                 request.session['victim_date_of_birth'] = cleaned_data.get('complainant_date_of_birth')
+
             else:
                 # Store victim information
                 request.session['victim_name'] = cleaned_data.get('victim_name')
@@ -238,8 +261,10 @@ def CaseStep1View(request):
             request.session['key_witness_digital_address'] = cleaned_data.get('key_witness_digital_address')
 
             # Proceed to the next step
-            return redirect('CaseStep2Form')
+            return redirect('CaseStep2View')
         else:
+            # Print the form errors for debugging
+            print("Form is not valid. Errors:", form_step1.errors)
             messages.error(request, "Please correct the errors below.")
     else:
         form_step1 = CaseStep1Form()
@@ -273,7 +298,7 @@ def CaseStep2View(request):
     else:
         form_step2 = CaseStep2Form()
 
-    return render(request, 'step2.html', {'form_step2': form_step2})
+    return render(request, 'docketforms.html', {'form_step2': form_step2})
 
 @login_required(login_url='officer_login')
 def CaseStep3View(request):
@@ -282,7 +307,7 @@ def CaseStep3View(request):
         if form.is_valid():
             # Retrieve data from the session
             case_data = {
-                'case_title': request.session.get('case_title'),
+                'Case_Title': request.session.get('case_title'),
                 'date_time_of_incident': request.session.get('date_time_of_incident'),
                 'date_time_of_report': request.session.get('date_time_of_report'),
 

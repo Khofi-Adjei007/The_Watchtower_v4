@@ -15,8 +15,9 @@
 <body>
     <div class="min-h-screen py-14 px-36 bg-gray-900 bg-cover bg-center">
         <div class="max-w-3xl mx-auto p-6 bg-gray-100 rounded-lg shadow-md">
+
             <div class="justify-center items-center mb-6 flex flex-row bg-blue-950 p-3 rounded-md">
-            <img class="h-12 mr-4" src="{% static 'staticfiles/admin/img/download.png' %}" alt="Your Company">
+            <img class="h-12 mr-4" src="{% static 'img/download.png' %}" alt="Your Company">
             <h2 class="text-3xl text-gray-100 font-bold uppercase">DOCKET REGISTRATION FORMS</h2>
             </div>
         
@@ -57,48 +58,41 @@
             <div id="stepGroup1" class="step-group" data-step-group="1">
             <div class="mb-8 bg-green-200 p-3">
 
-            <form method="post" action="{% url 'CaseStep1Form' %}" id="form_step1_submit"  novalidate>
+            <form method="post" action="{% url 'CaseStep1View' %}"  novalidate>
             <div class="grid grid-cols-2 gap-6 sm:grid-cols-1">
-            {% csrf_token %}
-                
-                    {% if form_step1.errors %}
-                    <div class="text-red-600">
-                        {% for field in form_step1 %}
-                            {% if field.errors %}
-                                <div>
-                                    <strong>{{ field.label }}:</strong>
-                                    {% for error in field.errors %}
-                                        <div>{{ error }}</div>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                {% endif %}
-                
-
-                <!-- General Case Information -->
-                <div class="mt-4">
-                <!-- General Case Information Header -->
-                <div class="relative flex items-center mb-4">
-                    <span class="relative px-4 text-white font-bold italic bg-blue-950 ">Title, Timestamps</span>
-                    <div class="flex-grow border-t border-gray-300"></div>
-                </div>
-                
-                <!-- General Case Information Fields -->
-                <div class="flex flex-col-2 gap-2">
-                    {% for field in form_step1 %}
-                        {% if field.name == 'case_title' or field.name == 'date_time_of_incident' or field.name == 'date_time_of_report' %}
-                        <div>
-                        <label for="{{ field.id_for_label }}" class="block text-gray-700 font-semibold">
-                        {{ field.label_tag }}
-                        </label>
-                        {{ field }}
+                                    {% csrf_token %}
+                    <!-- General Case Information -->
+                    <div class="mt-4">
+                        <!-- General Case Information Header -->
+                        <div class="relative flex items-center mb-4">
+                            <span class="relative px-4 text-white font-bold italic bg-blue-950">Title, Timestamps</span>
+                            <div class="flex-grow border-t border-gray-300"></div>
                         </div>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-                </div>
+
+                        <!-- General Case Information Fields -->
+                        <div class="flex flex-col-2 gap-2">
+                            {% for field in form_step1 %}
+                                {% if field.name == 'Case_Title' or field.name == 'date_time_of_incident' or field.name == 'date_time_of_report' %}
+                                <div>
+                                    <!-- Error Display -->
+                                    {% if form_step1.is_bound and field.errors %}
+                                        <div class="text-red-600 text-sm mb-2">
+                                            {% for error in field.errors %}
+                                                <p>{{ error }}</p>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    <!-- Field Label and Input -->
+                                    <label for="{{ field.id_for_label }}" class="block text-gray-700 font-semibold">
+                                        {{ field.label_tag }}
+                                    </label>
+                                    {{ field }}
+                                </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+
 
                 <!-- Complainant Information -->
                 <div class="mt-8">
@@ -114,6 +108,14 @@
                                 <div>
                                     <label for="{{ field.id_for_label }}" class="block text-gray-700 font-semibold">
                                         {{ field.label_tag }}
+                                                <!-- Error Display -->
+                                    {% if form_step1.is_bound and field.errors %}
+                                    <div class="text-red-600 text-sm mb-2">
+                                        {% for error in field.errors %}
+                                            <p>{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                                     </label>
                                     {{ field }}
                                 </div>
@@ -136,6 +138,14 @@
                                 <div>
                                 <label for="{{ field.id_for_label }}" class="block text-gray-700 font-semibold">
                                     {{ field.label_tag }}
+                                            <!-- Error Display -->
+                                            {% if form_step1.is_bound and field.errors %}
+                                            <div class="text-red-600 text-sm mb-2">
+                                                {% for error in field.errors %}
+                                                    <p>{{ error }}</p>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
                                     </label>
                                     {{ field }}
                                 </div>
@@ -170,6 +180,14 @@
                                 <div>
                                 <label for="{{ field.id_for_label }}" class="block text-gray-700 font-semibold">
                                 {{ field.label_tag }}
+                                        <!-- Error Display -->
+                                        {% if form_step1.is_bound and field.errors %}
+                                        <div class="text-red-600 text-sm mb-2">
+                                            {% for error in field.errors %}
+                                                <p>{{ error }}</p>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
                                 </label>
                                 {{ field }}
                                 </div>
@@ -193,6 +211,14 @@
                                 <div>
                                     <label for="{{ field.id_for_label }}" class="block text-gray-700 font-semibold">
                                         {{ field.label_tag }}
+                                                <!-- Error Display -->
+                                    {% if form_step1.is_bound and field.errors %}
+                                    <div class="text-red-600 text-sm mb-2">
+                                        {% for error in field.errors %}
+                                            <p>{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                                     </label>
                                     {{ field }}
                                 </div>
@@ -222,6 +248,14 @@
                                 <div>
                                     <label for="{{ field.id_for_label }}" class="block text-gray-700 font-semibold">
                                         {{ field.label_tag }}
+                                                <!-- Error Display -->
+                                    {% if form_step1.is_bound and field.errors %}
+                                    <div class="text-red-600 text-sm mb-2">
+                                        {% for error in field.errors %}
+                                            <p>{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                                     </label>
                                     {{ field }}
                                 </div>
@@ -240,7 +274,7 @@
                 </div>
                 </div>
                 
-                </form>
+            </form>
                 </div>    
             </div>
         
@@ -250,8 +284,9 @@
              <!-- Content for Step 2 -->
             <div id="stepGroup2" class="step-group hidden bg-yellow-100 p-3 mb-4" data-step-group="2">
             <div class="flex items-center mt-6 mb-4">
-                <form method="post" action="{% url 'CaseStep2Form' %}">
-                      {% csrf_token %}
+                <form method="post" action="{% url 'CaseStep2View' %}">
+                    {% csrf_token %}
+
                     <div class="col-span-2">
                         <!-- Complainant Statement Header -->
                         <div class="relative flex items-center mb-4">
@@ -378,7 +413,7 @@
                 <p id="witnessLimitMessage" class="hidden text-red-600 text-sm mt-2"></p>
                 </div>  
              
-            </form>
+                </form>
         </div>
           
             </div>
@@ -386,7 +421,8 @@
            
             <!-- Content for Step 3 -->
             <div id="stepGroup3" class="step-group hidden bg-red-200" data-step-group="3">
-            <form method="post" action="{% url 'CaseStep3Form' %}" id="form_step3_submit">
+            <form method="post" action="{% url 'CaseStep3View' %}" id="form_step3_submit">
+                {% csrf_token %}
 
             <!-- Reporting Officer Information Section -->
             <div class="mb-8 bg-red-200 p-3">
@@ -496,9 +532,12 @@
         </div>
             </form>
             </div> 
+
     </div> 
     </div>
     </div>
+
+
     <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Function to control the visibility of the victim toggle
@@ -506,36 +545,54 @@ document.addEventListener('DOMContentLoaded', function() {
         const sameVictimRadio = document.getElementById('sameVictim');
         const differentVictimRadio = document.getElementById('differentVictim');
         const victimInfoForm = document.getElementById('victimInfoForm');
-        const victimFields = [
-            'victim_physical_address',
-            'victim_name',
-            'victim_contact',
-            'victim_occupation',
-            'victim_date_of_birth'
-        ];
+        
+        const victimFields = {
+            name: document.getElementById('id_victim_name'),
+            contact: document.getElementById('id_victim_contact'),
+            physical_address: document.getElementById('id_victim_physical_address'),
+            digital_address: document.getElementById('id_victim_digital_address'),
+            occupation: document.getElementById('id_victim_occupation'),
+            date_of_birth: document.getElementById('id_victim_date_of_birth')
+        };
+
+        const complainantFields = {
+            name: document.getElementById('id_complainant_name'),
+            contact: document.getElementById('id_complainant_contact'),
+            physical_address: document.getElementById('id_complainant_physical_address'),
+            digital_address: document.getElementById('id_complainant_digital_address'),
+            occupation: document.getElementById('id_complainant_occupation'),
+            date_of_birth: document.getElementById('id_complainant_date_of_birth')
+        };
 
         sameVictimRadio.addEventListener('click', function() {
             victimInfoForm.classList.add('hidden');
-            victimFields.forEach(field => {
-                document.querySelector(`[name="${field}"]`).removeAttribute('required');
+            Object.keys(victimFields).forEach(field => {
+                victimFields[field].value = complainantFields[field].value;
+                victimFields[field].removeAttribute('required');
             });
         });
 
         differentVictimRadio.addEventListener('click', function() {
             victimInfoForm.classList.remove('hidden');
-            victimFields.forEach(field => {
-                document.querySelector(`[name="${field}"]`).setAttribute('required', 'required');
+            Object.keys(victimFields).forEach(field => {
+                victimFields[field].value = '';
+                victimFields[field].setAttribute('required', 'required');
             });
         });
     };
 
     // Initialize victim toggle functionality
     victimToggle();
+});
+
+
+
+
+
 
     // Witness box and addition
     let witnessCount = 0;
     const maxWitnesses = 5;
-
     document.getElementById('addWitnessButton').addEventListener('click', function() {
         if (witnessCount < maxWitnesses) {
             witnessCount++;
@@ -559,7 +616,6 @@ document.addEventListener('DOMContentLoaded', function() {
             messageElement.classList.remove('hidden');
         }
     });
-});
 
 
 

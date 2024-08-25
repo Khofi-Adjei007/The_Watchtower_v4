@@ -177,6 +177,7 @@ class NewOfficerRegistration(models.Model):
 
 class Case(models.Model):
     # Case Information
+    case_ID = models.CharField(max_length=255)
     Case_Title = models.CharField(max_length=255)
     date_time_of_incident = models.DateTimeField()
     date_time_of_report = models.DateTimeField()
