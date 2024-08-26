@@ -809,7 +809,6 @@ class CaseStep1Form(forms.Form):
 
 
 
-# Step 2 Form: Incident Details and Statements
 class CaseStep2Form(forms.Form):
     complainant_statement = forms.CharField(
         label="Complainant Statement",
@@ -820,7 +819,7 @@ class CaseStep2Form(forms.Form):
 
     def clean_complainant_statement(self):
         complainant_statement = self.cleaned_data.get('complainant_statement')
-        if not complainant_statement:
+        if not complainant_statement.strip():
             raise forms.ValidationError("Complainant statement cannot be empty.")
         return complainant_statement
 
@@ -833,7 +832,7 @@ class CaseStep2Form(forms.Form):
 
     def clean_suspect_statement(self):
         suspect_statement = self.cleaned_data.get('suspect_statement')
-        if not suspect_statement:
+        if not suspect_statement.strip():
             raise forms.ValidationError("Suspect statement cannot be empty.")
         return suspect_statement
 
@@ -846,7 +845,7 @@ class CaseStep2Form(forms.Form):
 
     def clean_witness_statement(self):
         witness_statement = self.cleaned_data.get('witness_statement')
-        if not witness_statement:
+        if not witness_statement.strip():
             raise forms.ValidationError("Witness statement cannot be empty.")
         return witness_statement
 
@@ -858,6 +857,9 @@ class CaseStep2Form(forms.Form):
 
     def clean_additional_witnesses(self):
         additional_witnesses = self.cleaned_data.get('additional_witnesses')
+        # Example of additional validation: limit length of additional witnesses text
+        if additional_witnesses and len(additional_witnesses) > 1000:
+            raise forms.ValidationError("Additional witnesses information is too long.")
         return additional_witnesses
 
 

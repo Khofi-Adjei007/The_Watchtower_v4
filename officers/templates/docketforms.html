@@ -55,12 +55,13 @@
 
 
             <!-- Content for Step 1 -->
-            <div id="stepGroup1" class="step-group" data-step-group="1">
+            <div id="stepGroup1" class="step-group" data-step-group="1" {% if current_step != 1 %}style="display: none;"{% endif %}>
             <div class="mb-8 bg-green-200 p-3">
 
             <form method="post" action="{% url 'CaseStep1View' %}"  novalidate>
             <div class="grid grid-cols-2 gap-6 sm:grid-cols-1">
-                                    {% csrf_token %}
+
+                    {% csrf_token %}
                     <!-- General Case Information -->
                     <div class="mt-4">
                         <!-- General Case Information Header -->
@@ -92,8 +93,6 @@
                             {% endfor %}
                         </div>
                     </div>
-
-
                 <!-- Complainant Information -->
                 <div class="mt-8">
                 <!-- Complainant Information Header -->
@@ -152,9 +151,7 @@
                             {% endif %}
                         {% endfor %}
                     </div>
-                </div>
-
-                    
+                </div>      
                 <!-- Victim Information -->
                 <div class="mt-8">
                   <!-- Victim Information Header -->
@@ -282,145 +279,165 @@
         
 
              <!-- Content for Step 2 -->
-            <div id="stepGroup2" class="step-group hidden bg-yellow-100 p-3 mb-4" data-step-group="2">
-            <div class="flex items-center mt-6 mb-4">
-                <form method="post" action="{% url 'CaseStep2View' %}">
-                    {% csrf_token %}
+             <div id="stepGroup2" class="step-group" data-step-group="2" {% if current_step != 2 %}style="display: none;"{% endif %}>
+                <div class="flex items-center mt-6 mb-4">
+                    <form method="post" action="{% url 'CaseStep2View' %}">
+                        {% csrf_token %}
 
-                    <div class="col-span-2">
-                        <!-- Complainant Statement Header -->
-                        <div class="relative flex items-center mb-4">
-                            <span class="relative px-4 text-white font-bold italic bg-green-600">
-                                Statement By <span class="text-blue-200">{{ complainant_name }}</span> (Complainant)
-                            </span>
+
+                        <div class="col-span-2">
+                            <!-- Complainant Statement Header -->
+                            <div class="relative flex items-center mb-4">
+                                <span class="relative px-4 text-white font-bold italic bg-green-600">
+                                    Statement By <span class="text-blue-200">{{ complainant_name }}</span> (Complainant)
+                                </span>
+                                <div class="flex-grow border-t border-gray-300"></div>
+                            </div>
+
+                            <!-- Complainant Information in Horizontal Layout -->
+                            <div class="flex flex-wrap mt-1 text-sm text-gray-600 space-x-4">
+                                <p><strong>Name:</strong> <span id="suspectName" class="text-blue-600">{{ complainant_name }}</span></p>
+                                <p><strong>Age:</strong> <span id="suspectAge" class="text-blue-600">{{ complainant_date_of_birth|calculate_age }}</span></p>
+                                <p><strong>Contact:</strong> <span id="suspectContact" class="text-blue-600">{{ complainant_contact }}</span></p>
+                                <p><strong>Address:</strong> <span id="suspectAddress" class="text-blue-600">{{ complainant_physical_address }}</span></p>
+                            </div>
+
+                            <!-- Complainant Statement -->
+                            <div>
+                                {{ form_step2.complainant_statement }}
+                            </div>
+                            <p class="mt-1 text-xs text-gray-500">
+                                This appears to be {{ complainant_name }} first time with The Watchtower. I found nothing of interest on her. 
+                                <a href="#" class="text-blue-600 hover:underline">---Read more---</a>
+                            </p>
+                        </div>
+
+                        <div class="col-span-2">
+                            <!-- Suspect Statement Header -->
+                            <div class="relative flex items-center mb-4 mt-10">
+                                <span class="relative px-4 text-white font-bold italic bg-red-600">
+                                    Statement By <span class="text-red-200">{{ suspect_name }}</span> (Suspect)
+                                </span>
+                                <div class="flex-grow border-t border-gray-300"></div>
+                            </div>
+
+                            <!-- Suspect Information in Horizontal Layout -->
+                            <div class="flex flex-wrap mt-1 text-sm text-gray-600 space-x-4">
+                                <p><strong>Name:</strong> <span id="suspectName" class="text-red-600">{{ suspect_name }}</span></p>
+                                <p><strong>Age:</strong> <span id="suspectAge" class="text-red-600">{{ suspect_date_of_birth|calculate_age }}</span></p>
+                                <p><strong>Contact:</strong> <span id="suspectContact" class="text-red-600">{{ suspect_contact }}</span></p>
+                                <p><strong>Address:</strong> <span id="suspectAddress" class="text-red-600">{{ suspect_physical_address }}</span></p>
+                            </div>
+
+                            <!-- Suspect Statement -->
+                            <div>
+                                <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                                    {% for field in form_step2 %}
+                                        {% if field.name|startswith:"key_witness_" %}
+                                            <div>
+                                                <label for="{{ field.id_for_label }}" class="block text-gray-700 font-semibold">
+                                                    {{ field.label_tag }}
+                                                            <!-- Error Display -->
+                                                {% if form_step1.is_bound and field.errors %}
+                                                <div class="text-red-600 text-sm mb-2">
+                                                    {% for error in field.errors %}
+                                                        <p>{{ error }}</p>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                                </label>
+                                                {{ field }}
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <p class="mt-1 text-xs text-gray-500">
+                                James Powah was last arrested at the Tesano police station for possessing weed. He was sentenced for 90 days. He, however, has no case of robbery as stated here. 
+                                <a href="#" class="text-blue-600 hover:underline">---Read more about James---</a>
+                            </p>
+                        </div>
+
+                        <div class="col-span-2">
+                            <!-- Witness Statement Header -->
+                            <div class="relative flex items-center mb-4 mt-10">
+                                <span class="relative px-4 text-white font-bold italic bg-orange-500">
+                                    Statement By <span class="text-green-200">{{ witness_name }}</span> (Key Witness)
+                                </span>
+                                <div class="flex-grow border-t border-gray-300"></div>
+                            </div>
+
+                            <!-- Witness Information in Horizontal Layout -->
+                            <div class="flex flex-wrap mt-1 text-sm text-gray-600 space-x-4">
+                                <p><strong>Name:</strong> <span id="suspectName" class="text-red-600">{{ key_witness_name }}</span></p>
+                                <p><strong>Age:</strong> <span id="suspectAge" class="text-red-600">28</span></p>
+                                <p><strong>Contact:</strong> <span id="suspectContact" class="text-red-600">{{ key_witness_age }}</span></p>
+                                <p><strong>Address:</strong> <span id="suspectAddress" class="text-red-600">{{ key_witness_address }}</span></p>
+                            </div>
+
+                            <!-- Witness Statement -->
+                            <div>
+                                {{ form_step2.witness_statement }}
+                            </div>
+                            <p class="mt-1 text-xs text-gray-500">
+                                This is Asiama's third time being a witness to a case. Does that guy have a job at all? Tell him to go get a job. Jesus Christ.
+                                <a href="#" class="text-blue-600 hover:underline">---Read more about Asiama---</a>
+                            </p>
+                        </div>
+
+                        <!-- Add Witness Button -->
+                        <div class="flex items-center mt-10 mb-1" id="addWitnessButton">
+                            <div class="flex-grow border-t border-gray-300"></div>
+                            <span class="px-4 text-gray-700 font-bold italic">Add Another Witness</span>
                             <div class="flex-grow border-t border-gray-300"></div>
                         </div>
-                    
-                        <!--  Complainant Information in Horizontal Layout -->
-                        <div class="flex flex-wrap mt-1 text-sm text-gray-600 space-x-4">
-                            <p><strong>Name:</strong> <span id="suspectName" class="text-blue-600">{{ suspect_name }}</span></p>
-                            <p><strong>Age:</strong> <span id="suspectAge" class="text-blue-600">{{ suspect_date_of_birth|calculate_age }}</span></p>
-                            <p><strong>Contact:</strong> <span id="suspectContact" class="text-blue-600">{{ suspect_contact }}</span></p>
-                            <p><strong>Address:</strong> <span id="suspectAddress" class="text-blue-600">{{ suspect_physical_address }}</span></p>
+
+                        <!-- Witness Container -->
+                        <div id="witnessContainer">
+                            <!-- Hidden witness statement box -->
+                            <div id="hiddenWitness" class="col-span-2 mb-4 hidden">
+                                <label class="block text-sm font-medium text-gray-700">Additional Witness Statement</label>
+                                <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Witness Name</label>
+                                        {{ form_step2.witness_name }}
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Witness Contact</label>
+                                        {{ form_step2.witness_contact }}
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Witness Physical Address</label>
+                                        {{ form_step2.witness_physical_address }}
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Witness Digital Address</label>
+                                        {{ form_step2.witness_digital_address }}
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Witness Date of Birth</label>
+                                        {{ form_step2.witness_date_of_birth }}
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Witness Occupation</label>
+                                        {{ form_step2.witness_occupation }}
+                                    </div>
+                                </div>
+                                {{ form_step2.witness_statement }}
+                                <p class="mt-1 text-xs text-gray-500">Include as much detail as possible.</p>
+                            </div>
                         </div>
-                    
-                        <!-- Complainant Statement -->
-                        <textarea class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500" rows="5" placeholder="Please provide a detailed account of the incident by the Complainant.">{{ form_step2.complainant_statement.value }}</textarea>
-                        <p class="mt-1 text-xs text-gray-500">
-                            This appears to be Akorfah's first cross with GPS. I found nothing on her. 
-                            <a href="#" class="text-blue-600 hover:underline">---Read more---</a>
-                        </p>
-                    </div>
-                    
-                    <div class="col-span-2">
-                        <!-- Suspect Statement Header -->
-                        <div class="relative flex items-center mb-4 mt-10">
-                            <span class="relative px-4 text-white font-bold italic bg-red-600">
-                                Statement By <span class="text-red-200">{{ suspect_name }}</span> (Suspect)
-                            </span>
-                            <div class="flex-grow border-t border-gray-300"></div>
-                        </div>
-                        
 
-                        <!-- Suspect Information in Horizontal Layout -->
-                        <div class="flex flex-wrap mt-1 text-sm text-gray-600 space-x-4">
-                            <p><strong>Name:</strong> <span id="suspectName" class="text-red-600">{{ suspect_name }}</span></p>
-                            <p><strong>Age:</strong> <span id="suspectAge" class="text-red-600">{{ suspect_date_of_birth|calculate_age }}</span></p>
-                            <p><strong>Contact:</strong> <span id="suspectContact" class="text-red-600">{{ suspect_contact }}</span></p>
-                            <p><strong>Address:</strong> <span id="suspectAddress" class="text-red-600">{{ suspect_physical_address }}</span></p>
-                        </div>
-                        <!-- Textarea for Statement -->
-                        <textarea class="mt-4 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500" rows="5" placeholder="Please provide a detailed account of the incident by the Suspect.">{{ suspect_statement }}</textarea>
-                        <!-- Suspect's Criminal Record or Background Information -->
-                        <p class="mt-1 text-xs text-gray-500">
-                            James Powah was last arrested at the Tesano police station for possessing weed. He was sentenced for 90 days. He however has no case of robbery as stated here. 
-                            <a href="#" class="text-blue-600 hover:underline">---Read more about James---</a>
-                        </p>
-                    </div>
-                    
-     
-                    <div class="col-span-2">
-                      <!-- Witness Statement Header -->
-                      <div class="relative flex items-center mb-4 mt-10">
-                        <span class="relative px-4 text-white font-bold italic bg-orange-500">
-                            Statement By <span class="text-green-200">{{ witness_name }}</span> (Key Witness)
-                        </span>
-                        <div class="flex-grow border-t border-gray-300"></div>
-                    </div>
-                    
-
-                    <!-- Suspect Information in Horizontal Layout -->
-                    <div class="flex flex-wrap mt-1 text-sm text-gray-600 space-x-4">
-                        <p><strong>Name:</strong> <span id="suspectName" class="text-red-600">{{ key_witness_name }}</span></p>
-                        <p><strong>Age:</strong> <span id="suspectAge" class="text-red-6000">28</span></p>
-                        <p><strong>Contact:</strong> <span id="suspectContact" class="text-red-600">{{ key_witness_age }}</span></p>
-                        <p><strong>Address:</strong> <span id="suspectAddress" class="text-red-600">{{ key_witness_address }}</span></p>
-                    </div>
-                  <!-- Key Witness Statement -->
-                  <textarea class="mt-4 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500" rows="5" placeholder="Please provide a detailed account of the incident by the Key Witness.">{{ witness_statement }}</textarea>
-  
-
-                <!-- Suspect's Criminal Record or Background Information -->
-                <p class="mt-1 text-xs text-gray-500">
-                    This is Asiama's third time being a witness to a case. Does that guy has a job at all, tell him to go get a fucking job. Jesus Christ
-                    <a href="#" class="text-blue-600 hover:underline">---Read more about Asiama---</a>
-                </p>
-
-                <!-- Add Witness Button -->
-                <div class="flex items-center mt-10 mb-1" id="addWitnessButton">
-                    <div class="flex-grow border-t border-gray-300"></div>
-                    <span class="px-4 text-gray-700 font-bold italic">Add Another Witness</span>
-                    <div class="flex-grow border-t border-gray-300"></div>
+                        <!-- Witness Limit Message -->
+                        <p id="witnessLimitMessage" class="hidden text-red-600 text-sm mt-2"></p>
+                    </form>
                 </div>
-
-                <!-- Witness Container -->
-                <div id="witnessContainer" class="">
-
-                <!-- Hidden witness statement box -->
-                <div id="hiddenWitness" class="col-span-2 mb-4 hidden">
-                <label class="block text-sm font-medium text-gray-700">Additional Witness Statement</label>
-                <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Witness Name</label>
-                        <input type="text" name="witness_name[]" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Witness Name">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Witness Contact</label>
-                        <input type="text" name="witness_contact[]" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Witness Contact">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Witness Physical Address</label>
-                        <input type="text" name="witness_physical_address[]" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Witness Physical Address">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Witness Digital Address</label>
-                        <input type="text" name="witness_digital_address[]" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Witness Digital Address">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Witness Date of Birth</label>
-                        <input type="date" name="witness_date_of_birth[]" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Witness Occupation</label>
-                        <input type="text" name="witness_occupation[]" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Witness Occupation">
-                    </div>
-                </div>
-                <textarea name="witness_statement[]" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500" rows="4" placeholder="Please provide a detailed account of the incident by the additional witness."></textarea>
-                <p class="mt-1 text-xs text-gray-500">Include as much detail as possible.</p>
-                </div>
-                </div>
-                <!-- Witness Limit Message -->
-                <p id="witnessLimitMessage" class="hidden text-red-600 text-sm mt-2"></p>
-                </div>  
-             
-                </form>
-        </div>
-          
             </div>
+
 
            
             <!-- Content for Step 3 -->
-            <div id="stepGroup3" class="step-group hidden bg-red-200" data-step-group="3">
+            <div id="stepGroup3" class="step-group" data-step-group="3" {% if current_step != 3 %}style="display: none;"{% endif %}>
             <form method="post" action="{% url 'CaseStep3View' %}" id="form_step3_submit">
                 {% csrf_token %}
 
@@ -538,7 +555,7 @@
     </div>
 
 
-    <script>
+<script>
 document.addEventListener('DOMContentLoaded', function() {
     // Function to control the visibility of the victim toggle
     const victimToggle = () => {
@@ -586,10 +603,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-
-
-
-
     // Witness box and addition
     let witnessCount = 0;
     const maxWitnesses = 5;
@@ -618,8 +631,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
 
-
-
-    </script>
+    
+</script>
 </body>
 </html>
