@@ -811,7 +811,7 @@ class CaseStep2Form(forms.Form):
         widget=forms.Textarea(
             attrs={
                 'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
-                'placeholder': 'Describe the incident in detail',
+                'placeholder': 'Write complainant_statement here',
                 'rows': 5
             }),
         required=True,
@@ -828,7 +828,7 @@ class CaseStep2Form(forms.Form):
         widget=forms.Textarea(
             attrs={
                 'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
-                'placeholder': 'Describe the incident in detail',
+                'placeholder': 'Write the suspects statement here',
                 'rows': 5
             }),
         required=True,
@@ -841,43 +841,44 @@ class CaseStep2Form(forms.Form):
             raise forms.ValidationError("Suspect statement cannot be empty.")
         return suspect_statement
 
-    witness_statement = forms.CharField(
+    key_witness_statement = forms.CharField(
         label="Witness Statement",
         widget=forms.Textarea(
             attrs={
                 'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
-                'placeholder': 'Describe the incident in detail',
+                'placeholder': 'Write the key witness statement here',
                 'rows': 5
             }
         ),
         required=True,
         error_messages={'required': 'Witness statement is required.'}
     )
+    
+    def clean_key_witness_statement(self):
+        key_witness_statement = self.cleaned_data.get('key_witness_statement')
+        if not key_witness_statement.strip():
+            raise forms.ValidationError("key_witness_statement statement cannot be empty.")
+        return key_witness_statement
 
-    def clean_witness_statement(self):
-        witness_statement = self.cleaned_data.get('witness_statement')
-        if not witness_statement.strip():
-            raise forms.ValidationError("Witness statement cannot be empty.")
-        return witness_statement
 
-    additional_witnesses = forms.CharField(
-        label="Additional Witnesses",
-        widget=forms.Textarea(
-            attrs={
-                'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
-                'placeholder': 'Describe the incident in detail',
-                'rows': 5
-            }
-        ),
-        required=False
-    )
+    # additional_witnesses = forms.CharField(
+    #     label="Additional Witnesses",
+    #     widget=forms.Textarea(
+    #         attrs={
+    #             'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
+    #             'placeholder': 'Describe the incident in detail',
+    #             'rows': 5
+    #         }
+    #     ),
+    #     required=False
+    # )
 
-    def clean_additional_witnesses(self):
-        additional_witnesses = self.cleaned_data.get('additional_witnesses')
-        # Example of additional validation: limit length of additional witnesses text
-        if additional_witnesses and len(additional_witnesses) > 1000:
-            raise forms.ValidationError("Additional witnesses information is too long.")
-        return additional_witnesses
+    # def clean_additional_witnesses(self):
+    #     additional_witnesses = self.cleaned_data.get('additional_witnesses')
+    #     # Example of additional validation: limit length of additional witnesses text
+    #     if additional_witnesses and len(additional_witnesses) > 1000:
+    #         raise forms.ValidationError("Additional witnesses information is too long.")
+    #     return additional_witnesses
 
 
 
@@ -887,51 +888,51 @@ class CaseStep3Form(forms.Form):
         label="Reporting Officer Name", max_length=250, required=True,
         error_messages={'required': 'Reporting officer name is required.'}
     )
-    def clean_reporting_officer_name(self):
-        reporting_officer_name = self.cleaned_data.get('reporting_officer_name')
-        if not reporting_officer_name:
-            raise forms.ValidationError("Reporting officer name cannot be empty.")
-        return reporting_officer_name
+    # def clean_reporting_officer_name(self):
+    #     reporting_officer_name = self.cleaned_data.get('reporting_officer_name')
+    #     if not reporting_officer_name:
+    #         raise forms.ValidationError("Reporting officer name cannot be empty.")
+    #     return reporting_officer_name
 
     reporting_officer_badge_id = forms.CharField(
         label="Badge ID", max_length=50, required=True,
         error_messages={'required': 'Badge ID is required.'}
     )
-    def clean_reporting_officer_badge_id(self):
-        reporting_officer_badge_id = self.cleaned_data.get('reporting_officer_badge_id')
-        if not reporting_officer_badge_id:
-            raise forms.ValidationError("Badge ID cannot be empty.")
-        return reporting_officer_badge_id
+    # def clean_reporting_officer_badge_id(self):
+    #     reporting_officer_badge_id = self.cleaned_data.get('reporting_officer_badge_id')
+    #     if not reporting_officer_badge_id:
+    #         raise forms.ValidationError("Badge ID cannot be empty.")
+    #     return reporting_officer_badge_id
 
     reporting_officer_rank = forms.CharField(
         label="Rank", max_length=100, required=True,
         error_messages={'required': 'Rank is required.'}
     )
-    def clean_reporting_officer_rank(self):
-        reporting_officer_rank = self.cleaned_data.get('reporting_officer_rank')
-        if not reporting_officer_rank:
-            raise forms.ValidationError("Rank cannot be empty.")
-        return reporting_officer_rank
+    # def clean_reporting_officer_rank(self):
+    #     reporting_officer_rank = self.cleaned_data.get('reporting_officer_rank')
+    #     if not reporting_officer_rank:
+    #         raise forms.ValidationError("Rank cannot be empty.")
+    #     return reporting_officer_rank
 
     reporting_officer_station = forms.CharField(
         label="Station", max_length=250, required=True,
         error_messages={'required': 'Station is required.'}
     )
-    def clean_reporting_officer_station(self):
-        reporting_officer_station = self.cleaned_data.get('reporting_officer_station')
-        if not reporting_officer_station:
-            raise forms.ValidationError("Station cannot be empty.")
-        return reporting_officer_station
+    # def clean_reporting_officer_station(self):
+    #     reporting_officer_station = self.cleaned_data.get('reporting_officer_station')
+    #     if not reporting_officer_station:
+    #         raise forms.ValidationError("Station cannot be empty.")
+    #     return reporting_officer_station
 
     reporting_officer_division = forms.CharField(
         label="Division", max_length=250, required=True,
         error_messages={'required': 'Division is required.'}
     )
-    def clean_reporting_officer_division(self):
-        reporting_officer_division = self.cleaned_data.get('reporting_officer_division')
-        if not reporting_officer_division:
-            raise forms.ValidationError("Division cannot be empty.")
-        return reporting_officer_division
+    # def clean_reporting_officer_division(self):
+    #     reporting_officer_division = self.cleaned_data.get('reporting_officer_division')
+    #     if not reporting_officer_division:
+    #         raise forms.ValidationError("Division cannot be empty.")
+    #     return reporting_officer_division
 
     charges_filed = forms.CharField(
         label="Charges Filed",
@@ -939,11 +940,11 @@ class CaseStep3Form(forms.Form):
         required=True,
         error_messages={'required': 'Charges filed are required.'}
     )
-    def clean_charges_filed(self):
-        charges_filed = self.cleaned_data.get('charges_filed')
-        if not charges_filed:
-            raise forms.ValidationError("Charges filed cannot be empty.")
-        return charges_filed
+    # def clean_charges_filed(self):
+    #     charges_filed = self.cleaned_data.get('charges_filed')
+    #     if not charges_filed:
+    #         raise forms.ValidationError("Charges filed cannot be empty.")
+    #     return charges_filed
 
     legal_actions_taken = forms.CharField(
         label="Legal Actions Taken",
@@ -951,58 +952,58 @@ class CaseStep3Form(forms.Form):
         required=True,
         error_messages={'required': 'Legal actions taken are required.'}
     )
-    def clean_legal_actions_taken(self):
-        legal_actions_taken = self.cleaned_data.get('legal_actions_taken')
-        if not legal_actions_taken:
-            raise forms.ValidationError("Legal actions taken cannot be empty.")
-        return legal_actions_taken
+    # def clean_legal_actions_taken(self):
+    #     legal_actions_taken = self.cleaned_data.get('legal_actions_taken')
+    #     if not legal_actions_taken:
+    #         raise forms.ValidationError("Legal actions taken cannot be empty.")
+    #     return legal_actions_taken
 
     assigned_investigator = forms.CharField(
         label="Assigned Investigator", max_length=250, required=True,
         error_messages={'required': 'Assigned investigator is required.'}
     )
-    def clean_assigned_investigator(self):
-        assigned_investigator = self.cleaned_data.get('assigned_investigator')
-        if not assigned_investigator:
-            raise forms.ValidationError("Assigned investigator cannot be empty.")
-        return assigned_investigator
+    # def clean_assigned_investigator(self):
+    #     assigned_investigator = self.cleaned_data.get('assigned_investigator')
+    #     if not assigned_investigator:
+    #         raise forms.ValidationError("Assigned investigator cannot be empty.")
+    #     return assigned_investigator
 
     case_status = forms.CharField(
         label="Case Status", max_length=100, required=True,
         error_messages={'required': 'Case status is required.'}
     )
-    def clean_case_status(self):
-        case_status = self.cleaned_data.get('case_status')
-        if not case_status:
-            raise forms.ValidationError("Case status cannot be empty.")
-        return case_status
+    # def clean_case_status(self):
+    #     case_status = self.cleaned_data.get('case_status')
+    #     if not case_status:
+    #         raise forms.ValidationError("Case status cannot be empty.")
+    #     return case_status
 
     follow_up_required = forms.BooleanField(
         label="Follow-Up Required", required=False
     )
 
-    additional_notes = forms.CharField(
-        label="Additional Notes",
-        widget=forms.Textarea(),  # Add parentheses here as well
-        required=False
-    )
+    # additional_notes = forms.CharField(
+    #     label="Additional Notes",
+    #     widget=forms.Textarea(),  # Add parentheses here as well
+    #     required=False
+    # )
 
     mugshot = forms.ImageField(
         label="Mugshot", required=True,
         error_messages={'required': 'Mugshot is required.'}
     )
-    def clean_mugshot(self):
-        mugshot = self.cleaned_data.get('mugshot')
-        if mugshot and not mugshot.content_type.startswith('image/'):
-            raise forms.ValidationError("Mugshot must be an image file.")
-        return mugshot
+    # def clean_mugshot(self):
+    #     mugshot = self.cleaned_data.get('mugshot')
+    #     if mugshot and not mugshot.content_type.startswith('image/'):
+    #         raise forms.ValidationError("Mugshot must be an image file.")
+    #     return mugshot
 
     fingerprint = forms.FileField(
         label="Fingerprint", required=True,
         error_messages={'required': 'Fingerprint is required.'}
     )
-    def clean_fingerprint(self):
-        fingerprint = self.cleaned_data.get('fingerprint')
-        if fingerprint and fingerprint.content_type not in ['image/png', 'image/jpeg']:
-            raise forms.ValidationError("Fingerprint must be a PNG or JPEG file.")
-        return fingerprint
+    # def clean_fingerprint(self):
+    #     fingerprint = self.cleaned_data.get('fingerprint')
+    #     if fingerprint and fingerprint.content_type not in ['image/png', 'image/jpeg']:
+    #         raise forms.ValidationError("Fingerprint must be a PNG or JPEG file.")
+    #     return fingerprint

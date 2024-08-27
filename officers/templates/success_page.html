@@ -1,0 +1,41 @@
+<!-- templates/success_page.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Success</title>
+    <style>
+        /* Add your success animation styles here */
+        .success-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+        .success-animation {
+            /* Example success animation (e.g., a green checkmark) */
+            font-size: 50px;
+            color: #4CAF50;
+        }
+    </style>
+    <script>
+        // Automatically redirect to the home page after 3 seconds
+        setTimeout(function() {
+            window.location.href = "{% url 'home_page' %}"; // Replace 'home_page' with your actual home page URL name
+        }, 3000); // 3 seconds delay
+    </script>
+</head>
+<body>
+    <div class="success-container">
+        <div>
+            <div class="success-animation">
+                &#10004; <!-- Checkmark icon -->
+            </div>
+            <h2>Success! Your docket has been registered.</h2>
+            <p>Redirecting you to the home page...</p>
+        </div>
+    </div>
+</body>
+</html>

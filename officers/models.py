@@ -225,10 +225,9 @@ class Case(models.Model):
     
 
     # Step 2 Fields: Statements and Additional Witnesses
-    complainant_statement = models.TextField()
-    suspect_statement = models.TextField()
-    witness_statement = models.TextField()
-    additional_witnesses = models.JSONField(default=list, blank=True)
+    complainant_statement = models.TextField(blank=False, null=False)
+    suspect_statement = models.TextField(blank=False, null=False)
+    key_witness_statement = models.TextField(blank=False, null=False)
 
     # Step 3 Fields: Reporting Officer and Case Progression
     reporting_officer_name = models.CharField(max_length=255, blank=True, null=True)

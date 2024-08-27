@@ -2,6 +2,10 @@ import os
 import json
 import logging
 from io import BytesIO
+import logging
+import logging
+logger = logging.getLogger(__name__)
+from django.contrib.auth.decorators import login_required
 from datetime import datetime
 
 from django.shortcuts import render, redirect, get_object_or_404
@@ -163,8 +167,8 @@ def verify_badge(request):
     
 
 
+
 @login_required(login_url='officer_login')
-@csrf_protect
 def CaseStep1View(request):
     if request.method == 'POST':
         form_step1 = CaseStep1Form(request.POST)
@@ -173,17 +177,13 @@ def CaseStep1View(request):
             cleaned_data = form_step1.cleaned_data
 
             # Store form data in session, ensuring JSON serialization
-            # request.session['case_ID'] = cleaned_data.get('case_ID')
             request.session['Case_Title'] = cleaned_data.get('case_title')
-            
-            # Convert datetime to string before storing in session
-            date_time_of_incident = cleaned_data.get('date_time_of_incident')
-            if date_time_of_incident:
-                request.session['date_time_of_incident'] = date_time_of_incident.isoformat()
 
-            date_time_of_report = cleaned_data.get('date_time_of_report')
-            if date_time_of_report:
-                request.session['date_time_of_report'] = date_time_of_report.isoformat()
+            # Convert datetime to string before storing in session
+            if cleaned_data.get('date_time_of_incident'):
+                request.session['date_time_of_incident'] = cleaned_data['date_time_of_incident'].isoformat()
+            if cleaned_data.get('date_time_of_report'):
+                request.session['date_time_of_report'] = cleaned_data['date_time_of_report'].isoformat()
 
             # Complainant Information
             request.session['complainant_name'] = cleaned_data.get('complainant_name')
@@ -191,10 +191,8 @@ def CaseStep1View(request):
             request.session['complainant_physical_address'] = cleaned_data.get('complainant_physical_address')
             request.session['complainant_digital_address'] = cleaned_data.get('complainant_digital_address')
             request.session['complainant_occupation'] = cleaned_data.get('complainant_occupation')
-            
-            complainant_date_of_birth = cleaned_data.get('complainant_date_of_birth')
-            if complainant_date_of_birth:
-                request.session['complainant_date_of_birth'] = complainant_date_of_birth.isoformat()
+            if cleaned_data.get('complainant_date_of_birth'):
+                request.session['complainant_date_of_birth'] = cleaned_data['complainant_date_of_birth'].isoformat()
 
             # Suspect Information
             request.session['suspect_name'] = cleaned_data.get('suspect_name')
@@ -202,24 +200,19 @@ def CaseStep1View(request):
             request.session['suspect_physical_address'] = cleaned_data.get('suspect_physical_address')
             request.session['suspect_digital_address'] = cleaned_data.get('suspect_digital_address')
             request.session['suspect_occupation'] = cleaned_data.get('suspect_occupation')
-
-            suspect_date_of_birth = cleaned_data.get('suspect_date_of_birth')
-            if suspect_date_of_birth:
-                request.session['suspect_date_of_birth'] = suspect_date_of_birth.isoformat()
+            if cleaned_data.get('suspect_date_of_birth'):
+                request.session['suspect_date_of_birth'] = cleaned_data['suspect_date_of_birth'].isoformat()
 
             # Victim Information
-            is_victim_same_as_complainant = cleaned_data.get('is_victim_same_as_complainant')
-            if is_victim_same_as_complainant:
+            if cleaned_data.get('is_victim_same_as_complainant'):
                 # Copy complainant data to victim
                 request.session['victim_name'] = cleaned_data.get('complainant_name')
                 request.session['victim_contact'] = cleaned_data.get('complainant_contact')
                 request.session['victim_physical_address'] = cleaned_data.get('complainant_physical_address')
                 request.session['victim_digital_address'] = cleaned_data.get('complainant_digital_address')
                 request.session['victim_occupation'] = cleaned_data.get('complainant_occupation')
-                
-                complainant_date_of_birth = cleaned_data.get('complainant_date_of_birth')
-                if complainant_date_of_birth:
-                    request.session['victim_date_of_birth'] = complainant_date_of_birth.isoformat()
+                if cleaned_data.get('complainant_date_of_birth'):
+                    request.session['victim_date_of_birth'] = cleaned_data['complainant_date_of_birth'].isoformat()
             else:
                 # Store victim information
                 request.session['victim_name'] = cleaned_data.get('victim_name')
@@ -227,10 +220,8 @@ def CaseStep1View(request):
                 request.session['victim_physical_address'] = cleaned_data.get('victim_physical_address')
                 request.session['victim_digital_address'] = cleaned_data.get('victim_digital_address')
                 request.session['victim_occupation'] = cleaned_data.get('victim_occupation')
-                
-                victim_date_of_birth = cleaned_data.get('victim_date_of_birth')
-                if victim_date_of_birth:
-                    request.session['victim_date_of_birth'] = victim_date_of_birth.isoformat()
+                if cleaned_data.get('victim_date_of_birth'):
+                    request.session['victim_date_of_birth'] = cleaned_data['victim_date_of_birth'].isoformat()
 
             # Incident Details
             request.session['location_of_incident'] = cleaned_data.get('location_of_incident')
@@ -243,7 +234,8 @@ def CaseStep1View(request):
             request.session['key_witness_physical_address'] = cleaned_data.get('key_witness_physical_address')
             request.session['key_witness_digital_address'] = cleaned_data.get('key_witness_digital_address')
 
-            # Proceed to the next step
+            # Redirect to the next step
+            # logger.debug(f"Session Data: {request.session.items()}")
             return redirect('CaseStep2View')
         else:
             # Print the form errors for debugging
@@ -272,14 +264,16 @@ def CaseStep1View(request):
 
 
 
+
+
+
 @login_required(login_url='officer_login')
-@csrf_protect
 def CaseStep2View(request):
-    
-    if not request.session.get('Case_Title') or not request.session.get('complainant_name'):
-        # Redirect to Step 1 if data from Step 1 is missing
-        return redirect('CaseStep1View')
-     
+    # # Check if the user accessed Step 2 without completing Step 1
+    # if not request.session.get('Case_Title'):
+    #     # Redirect to Step 1 if required session data is missing
+    #     return redirect('CaseStep1View')
+
     # Retrieve session data
     complainant_name = request.session.get('complainant_name', '')
     complainant_contact = request.session.get('complainant_contact', '')
@@ -302,9 +296,13 @@ def CaseStep2View(request):
             # Process the form data and update session
             request.session['complainant_statement'] = form_step2.cleaned_data.get('complainant_statement', '')
             request.session['suspect_statement'] = form_step2.cleaned_data.get('suspect_statement', '')
-            request.session['witness_statement'] = form_step2.cleaned_data.get('witness_statement', '')
-            
-            # Save additional data to session if needed
+            request.session['key_witness_statement'] = form_step2.cleaned_data.get('witness_statement', '')
+
+            # Set case_title and is_victim_same_as_complainant
+            request.session['case_title'] = form_step2.cleaned_data.get('case_title', '')
+            request.session['is_victim_same_as_complainant'] = form_step2.cleaned_data.get('is_victim_same_as_complainant', '')
+
+            # Save additional data to session
             request.session['suspect_name'] = form_step2.cleaned_data.get('suspect_name', suspect_name)
             request.session['suspect_contact'] = form_step2.cleaned_data.get('suspect_contact', suspect_contact)
             request.session['suspect_date_of_birth'] = form_step2.cleaned_data.get('suspect_date_of_birth', suspect_date_of_birth)
@@ -315,8 +313,11 @@ def CaseStep2View(request):
             request.session['key_witness_age'] = form_step2.cleaned_data.get('key_witness_age', key_witness_age)
             request.session['key_witness_address'] = form_step2.cleaned_data.get('key_witness_address', key_witness_address)
 
+            # Redirect to the next step
             return redirect('CaseStep3View')
         else:
+            # Log form errors
+            logger.error(f"Form errors in CaseStep2View: {form_step2.errors}")
             messages.error(request, "Please correct the errors below.")
     else:
         form_step2 = CaseStep2Form(initial={
@@ -349,103 +350,102 @@ def CaseStep2View(request):
         'key_witness_contact': key_witness_contact,
         'key_witness_address': key_witness_address,
     }
-
     return render(request, 'CaseStep2View.html', context)
 
 
 
 
 
+
+
 @login_required(login_url='officer_login')
-@csrf_protect
 def CaseStep3View(request):
-    # Check if the required session data from Step 2 exists
-    if not request.session.get('case_title'):
-        return redirect('CaseStep1View')
+    # # Ensure that necessary session data exists
+    # required_keys = [
+    #     'case_title', 'date_time_of_incident', 'date_time_of_report',
+    #     'complainant_name', 'complainant_contact', 'complainant_physical_address',
+    #     'complainant_digital_address', 'complainant_occupation', 'complainant_date_of_birth',
+    #     'complainant_statement',  # Added necessary statement fields
+    #     'suspect_name', 'suspect_contact', 'suspect_physical_address', 'suspect_digital_address',
+    #     'suspect_occupation', 'suspect_date_of_birth', 'suspect_statement',
+    #     'victim_name', 'victim_contact', 'victim_physical_address', 'victim_digital_address',
+    #     'victim_occupation', 'victim_date_of_birth', 'location_of_incident', 'type_of_incident',
+    #     'statement_of_incident',
+    #     'key_witness_name', 'key_witness_contact', 'key_witness_physical_address',
+    #     'key_witness_digital_address', 'key_witness_statement'
+    # ]
+
+    # # # Check if all required session data is present
+    # # if not all(request.session.get(key) for key in required_keys):
+    # #     return redirect('CaseStep2View')  # Redirect if any required data is missing
 
     if request.method == 'POST':
-        form = CaseStep3Form(request.POST, request.FILES or None)
-        if form.is_valid():
-            # Retrieve data from the session
+        form_step3 = CaseStep3Form(request.POST, request.FILES)
+        if form_step3.is_valid():
+            # Collect form data and session data
             case_data = {
                 'Case_Title': request.session.get('case_title'),
                 'date_time_of_incident': request.session.get('date_time_of_incident'),
                 'date_time_of_report': request.session.get('date_time_of_report'),
-
-                # Complainant Information
                 'complainant_name': request.session.get('complainant_name'),
                 'complainant_contact': request.session.get('complainant_contact'),
                 'complainant_physical_address': request.session.get('complainant_physical_address'),
                 'complainant_digital_address': request.session.get('complainant_digital_address'),
                 'complainant_occupation': request.session.get('complainant_occupation'),
                 'complainant_date_of_birth': request.session.get('complainant_date_of_birth'),
-
-                # Suspect Information
+                'complainant_statement': request.session.get('complainant_statement'),
                 'suspect_name': request.session.get('suspect_name'),
                 'suspect_contact': request.session.get('suspect_contact'),
                 'suspect_physical_address': request.session.get('suspect_physical_address'),
                 'suspect_digital_address': request.session.get('suspect_digital_address'),
                 'suspect_occupation': request.session.get('suspect_occupation'),
                 'suspect_date_of_birth': request.session.get('suspect_date_of_birth'),
-
-                # Victim Information
-                'is_victim_same_as_complainant': request.session.get('is_victim_same_as_complainant'),
+                'suspect_statement': request.session.get('suspect_statement'),
                 'victim_name': request.session.get('victim_name'),
                 'victim_contact': request.session.get('victim_contact'),
                 'victim_physical_address': request.session.get('victim_physical_address'),
                 'victim_digital_address': request.session.get('victim_digital_address'),
                 'victim_occupation': request.session.get('victim_occupation'),
                 'victim_date_of_birth': request.session.get('victim_date_of_birth'),
-
-                # Incident Details
                 'location_of_incident': request.session.get('location_of_incident'),
                 'type_of_incident': request.session.get('type_of_incident'),
                 'statement_of_incident': request.session.get('statement_of_incident'),
-
-                # Key Witness Information
                 'key_witness_name': request.session.get('key_witness_name'),
                 'key_witness_contact': request.session.get('key_witness_contact'),
                 'key_witness_physical_address': request.session.get('key_witness_physical_address'),
                 'key_witness_digital_address': request.session.get('key_witness_digital_address'),
+                'key_witness_statement': request.session.get('key_witness_statement'),
 
-                # Final step data from the current form submission
-                'reporting_officer_name': form.cleaned_data.get('reporting_officer_name'),
-                'reporting_officer_badge_id': form.cleaned_data.get('reporting_officer_badge_id'),
-                'reporting_officer_rank': form.cleaned_data.get('reporting_officer_rank'),
-                'reporting_officer_station': form.cleaned_data.get('reporting_officer_station'),
-                'reporting_officer_division': form.cleaned_data.get('reporting_officer_division'),
-                'charges_filed': form.cleaned_data.get('charges_filed'),
-                'legal_actions_taken': form.cleaned_data.get('legal_actions_taken'),
-                'assigned_investigator': form.cleaned_data.get('assigned_investigator'),
-                'case_status': form.cleaned_data.get('case_status'),
-                'follow_up_required': form.cleaned_data.get('follow_up_required'),
-                'additional_notes': form.cleaned_data.get('additional_notes'),
+                # Add final step form data
+                'reporting_officer_name': form_step3.cleaned_data.get('reporting_officer_name'),
+                'reporting_officer_badge_id': form_step3.cleaned_data.get('reporting_officer_badge_id'),
+                'reporting_officer_rank': form_step3.cleaned_data.get('reporting_officer_rank'),
+                'reporting_officer_station': form_step3.cleaned_data.get('reporting_officer_station'),
+                'reporting_officer_division': form_step3.cleaned_data.get('reporting_officer_division'),
+                'charges_filed': form_step3.cleaned_data.get('charges_filed'),
+                'legal_actions_taken': form_step3.cleaned_data.get('legal_actions_taken'),
+                'assigned_investigator': form_step3.cleaned_data.get('assigned_investigator'),
+                'case_status': form_step3.cleaned_data.get('case_status'),
+                'follow_up_required': form_step3.cleaned_data.get('follow_up_required'),
+                'additional_notes': form_step3.cleaned_data.get('additional_notes'),
             }
 
-            # Handle file uploads separately and add to case_data
-            mugshot = form.cleaned_data.get('mugshot')
-            fingerprint = form.cleaned_data.get('fingerprint')
+            # Generate PDF
+            pdf_buffer = generate_pdf(case_data)
 
-            # Create the Docket instance with all the collected data
-            docket = Case.objects.create(**case_data)
+            # Serve the PDF
+            response = HttpResponse(pdf_buffer, content_type='application/pdf')
+            response['Content-Disposition'] = 'attachment; filename="case_report.pdf"'
+            return response
 
-            # Save the files if they exist
-            if mugshot:
-                docket.mugshot = mugshot
-            if fingerprint:
-                docket.fingerprint = fingerprint
-            docket.save()
-
-            # Generate PDF and save it
-            pdf_file_path = generate_pdf(docket)
-            
-            # Clear the session after saving
-            request.session.flush()
-
-            messages.success(request, "Docket successfully registered.")
-            return redirect('success_page')  # Replace with the name of your success URL
         else:
             messages.error(request, "Please correct the errors below.")
     else:
-        form = CaseStep3Form()  # Instantiate an empty form for GET requests
-    return render(request, 'CaseStep3View.html', {'form': form})
+        form_step3 = CaseStep3Form()
+
+    return render(request, 'CaseStep3View.html', {'form': form_step3})
+
+
+
+def success_page(request):
+    return render(request, 'success_page.html')

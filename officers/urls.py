@@ -19,6 +19,7 @@ urlpatterns = [
     path('CaseStep1View/', views.CaseStep1View, name='CaseStep1View'),
     path('CaseStep2View/', views.CaseStep2View, name='CaseStep2View'),
     path('CaseStep3View/', views.CaseStep3View, name='CaseStep3View'),
+    path('success_page/', views.success_page, name='success_page')
 ]
 
 if settings.DEBUG:

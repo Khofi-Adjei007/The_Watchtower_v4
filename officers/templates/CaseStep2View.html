@@ -43,8 +43,8 @@
             
 
              <!-Content for Step 2 -->
-            <div id="stepGroup2" class="step-group bg-yellow-100 p-3 mb-4" data-step-group="2" novalidate>
-                <div id="stepGroup2" class="step-group bg-yellow-100 p-3 mb-4" data-step-group="2" novalidate>
+            <div id="stepGroup2" class="step-group bg-yellow-100 p-3 mb-4" data-step-group="2">
+                <div id="stepGroup2" class="step-group bg-yellow-100 p-3 mb-4" data-step-group="2" >
                     <form method="post" action="{% url 'CaseStep2View' %}" novalidate>
                         {% csrf_token %}
             
@@ -56,7 +56,6 @@
                                 </span>
                                 <div class="flex-grow border-t border-gray-300"></div>
                             </div>
-            
                             <!-- Complainant Information in Horizontal Layout -->
                             <div class="flex flex-wrap mt-1 text-sm text-gray-600 space-x-4">
                                 <p><strong>Name:</strong> <span id="complainantName" class="text-blue-600">{{ complainant_name }}</span></p>
@@ -71,10 +70,11 @@
                             </div>
                             <p class="mt-1 text-xs text-gray-500">
                                 This appears to be {{ complainant_name }}'s first time with The Watchtower. I found nothing of interest on her. 
-                                <a href="#" class="text-blue-600 hover:underline">---Read more---</a>
+                                <a href="#" class="text-blue-600 hover:underline">---Read more about {{ complainant_name }}---</a>
                             </p>
                         </div>
             
+
                         <div class="col-span-2">
                             <!-- Suspect Statement Header -->
                             <div class="relative flex items-center mb-4 mt-10">
@@ -95,13 +95,14 @@
                             <!-- Suspect Statement -->
                             {{ form_step2.suspect_statement }}
                             <p class="mt-1 text-xs text-gray-500">
-                                James Powah was last arrested at the Tesano police station for possessing weed. He was sentenced for 90 days. He, however, has no case of robbery as stated here. 
-                                <a href="#" class="text-blue-600 hover:underline">---Read more about James---</a>
+                                {{ suspect_name }} was last arrested at the Tesano police station for possessing unidentified drugs. He was sentenced for 90 days. He, however, has not be involved in any
+                                 case of robbery as as recored...
+                                <a href="#" class="text-blue-600 hover:underline">---Read more about {{ suspect_name }}---</a>
                             </p>
                         </div>
             
                         <div class="col-span-2">
-                            <!-- Witness Statement Header -->
+                            <!-- Key Witness Statement Header -->
                             <div class="relative flex items-center mb-4 mt-10">
                                 <span class="relative px-4 text-white font-bold italic bg-orange-500">
                                     Statement By <span class="text-green-200">{{ key_witness_name }}</span> (Key Witness)
@@ -111,38 +112,38 @@
             
                             <!-- Witness Information in Horizontal Layout -->
                             <div class="flex flex-wrap mt-1 text-sm text-gray-600 space-x-4">
-                                <p><strong>Name:</strong> <span id="witnessName" class="text-red-600">{{ key_witness_name }}</span></p>
-                                <p><strong>Age:</strong> <span id="witnessAge" class="text-red-600">{{ key_witness_age }}</span></p>
-                                <p><strong>Contact:</strong> <span id="witnessContact" class="text-red-600">{{ key_witness_contact }}</span></p>
-                                <p><strong>Address:</strong> <span id="witnessAddress" class="text-red-600">{{ key_witness_address }}</span></p>
+                                <p><strong>Name:</strong> <span id="witnessName" class="text-orange-500">{{ key_witness_name }}</span></p>
+                                <p><strong>Age:</strong> <span id="witnessAge" class="text-orange-500">{{ key_witness_age }}</span></p>
+                                <p><strong>Contact:</strong> <span id="witnessContact" class="text-orange-500">{{ key_witness_contact }}</span></p>
+                                <p><strong>Address:</strong> <span id="witnessAddress" class="text-orange-500">{{ key_witness_physical_address }}</span></p>
                             </div>
-            
-                            <!-- Witness Statement -->
                             <div>
-                                {{ form_step2.witness_statement }}
+                                {{ form_step2.key_witness_statement }}
                             </div>
                             <p class="mt-1 text-xs text-gray-500">
-                                This is Asiama's third time being a witness to a case. Does that guy have a job at all? Tell him to go get a job. Jesus Christ.
-                                <a href="#" class="text-blue-600 hover:underline">---Read more about Asiama---</a>
+                                This is {{ key_witness_name }} third time being a witness to a case. Does that guy have a job at all? Tell him to go get a job. Jesus Christ.
+                                <a href="#" class="text-blue-600 hover:underline">---Read more about {{ key_witness_name }}---</a>
                             </p>
                         </div>
             
-                        <!-- Add Witness Button -->
+
+
+                
+                        <!-- Additional Witness Container -->
+                            <!-- Add Witness Button -->
                         <div class="flex items-center mt-10 mb-1" id="addWitnessButton">
                             <div class="flex-grow border-t border-gray-300"></div>
                             <span class="px-4 text-gray-700 font-bold italic">Add Another Witness</span>
                             <div class="flex-grow border-t border-gray-300"></div>
                         </div>
-            
-                        <!-- Witness Container -->
+<!-- 
                         <div id="witnessContainer">
-                            <!-- Hidden witness statement box -->
                             <div id="hiddenWitness" class="col-span-2 mb-4 hidden">
                                 <label class="block text-sm font-medium text-gray-700">Additional Witness Statement</label>
                                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700">Witness Name</label>
-                                        {{ form_step2.witness_name }}
+                                        {{ form_step2.additional_witnesses }}
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700">Witness Contact</label>
@@ -152,24 +153,12 @@
                                         <label class="block text-sm font-medium text-gray-700">Witness Physical Address</label>
                                         {{ form_step2.witness_physical_address }}
                                     </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700">Witness Digital Address</label>
-                                        {{ form_step2.witness_digital_address }}
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700">Witness Date of Birth</label>
-                                        {{ form_step2.witness_date_of_birth }}
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700">Witness Occupation</label>
-                                        {{ form_step2.witness_occupation }}
-                                    </div>
                                 </div>
                                 {{ form_step2.witness_statement }}
                                 <p class="mt-1 text-xs text-gray-500">Include as much detail as possible.</p>
                             </div>
                         </div>
-            
+             -->
                         <!-- Witness Limit Message -->
                         <p id="witnessLimitMessage" class="hidden text-red-600 text-sm mt-2"></p>
             
@@ -178,7 +167,7 @@
                                 <!-- Back Button -->
                                 <button type="button" id="backButton" class="bg-gray-600 hover:bg-gray-500 text-white font-semibold py-2 px-4 rounded-md shadow-sm">Back</button>
                                 <!-- Continue Button -->
-                                <button type="submit" id="continueButton" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 px-4 rounded-md shadow-sm">Continue</button>
+                                <button type="submit" id="continueBut" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 px-4 rounded-md shadow-sm">Continue</button>
                             </div>
                         </div>
                     </form>
