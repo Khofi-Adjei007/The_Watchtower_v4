@@ -18,16 +18,22 @@ def calculate_age(birth_date):
     """Calculate age from birth date."""
     if not birth_date:
         return 'N/A'
-    
+
     if isinstance(birth_date, str):
-        try:
-            birth_date = datetime.strptime(birth_date, '%Y-%m-%d').date()
-        except ValueError:
+        date_formats = ['%Y-%m-%d', '%d-%m-%Y', '%m/%d/%Y'] 
+        for fmt in date_formats:
+            try:
+                birth_date = datetime.strptime(birth_date, fmt).date()
+                break
+            except ValueError:
+                continue
+        else:
             return 'N/A'
-    
+
     if isinstance(birth_date, date):
         today = date.today()
         age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
         return age
     else:
         return 'N/A'
+

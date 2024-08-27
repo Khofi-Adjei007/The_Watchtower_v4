@@ -753,8 +753,7 @@ class CaseStep1Form(forms.Form):
         ),
         error_messages={
             'invalid': 'Enter a valid contact number.'
-        }
-    )
+        })
 
     def clean_key_witness_contact(self):
         key_witness_contact = self.cleaned_data.get('key_witness_contact')
@@ -776,8 +775,7 @@ class CaseStep1Form(forms.Form):
         ),
         error_messages={
             'invalid': 'Enter a valid physical address.'
-        }
-    )
+        })
 
     def clean_key_witness_physical_address(self):
         key_witness_physical_address = self.cleaned_data.get('key_witness_physical_address')
@@ -793,12 +791,10 @@ class CaseStep1Form(forms.Form):
             attrs={
                 'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
                 'placeholder': 'Enter the digital address'
-            }
-        ),
+            }),
         error_messages={
             'invalid': 'Enter a valid digital address.'
-        }
-    )
+        })
 
     def clean_key_witness_digital_address(self):
         key_witness_digital_address = self.cleaned_data.get('key_witness_digital_address')
@@ -812,10 +808,14 @@ class CaseStep1Form(forms.Form):
 class CaseStep2Form(forms.Form):
     complainant_statement = forms.CharField(
         label="Complainant Statement",
-        widget=forms.Textarea(),  # Add parentheses to create an instance of the widget
+        widget=forms.Textarea(
+            attrs={
+                'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
+                'placeholder': 'Describe the incident in detail',
+                'rows': 5
+            }),
         required=True,
-        error_messages={'required': 'Complainant statement is required.'}
-    )
+        error_messages={'required': 'Complainant statement is required.'})
 
     def clean_complainant_statement(self):
         complainant_statement = self.cleaned_data.get('complainant_statement')
@@ -825,7 +825,12 @@ class CaseStep2Form(forms.Form):
 
     suspect_statement = forms.CharField(
         label="Suspect Statement",
-        widget=forms.Textarea(),  # Add parentheses here as well
+        widget=forms.Textarea(
+            attrs={
+                'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
+                'placeholder': 'Describe the incident in detail',
+                'rows': 5
+            }),
         required=True,
         error_messages={'required': 'Suspect statement is required.'}
     )
@@ -838,7 +843,13 @@ class CaseStep2Form(forms.Form):
 
     witness_statement = forms.CharField(
         label="Witness Statement",
-        widget=forms.Textarea(),  # Add parentheses here as well
+        widget=forms.Textarea(
+            attrs={
+                'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
+                'placeholder': 'Describe the incident in detail',
+                'rows': 5
+            }
+        ),
         required=True,
         error_messages={'required': 'Witness statement is required.'}
     )
@@ -851,7 +862,13 @@ class CaseStep2Form(forms.Form):
 
     additional_witnesses = forms.CharField(
         label="Additional Witnesses",
-        widget=forms.Textarea(),  # Add parentheses here as well
+        widget=forms.Textarea(
+            attrs={
+                'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
+                'placeholder': 'Describe the incident in detail',
+                'rows': 5
+            }
+        ),
         required=False
     )
 

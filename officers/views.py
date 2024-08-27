@@ -3,7 +3,6 @@ import json
 import logging
 from io import BytesIO
 from datetime import datetime
-from django.middleware.csrf import get_token
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
@@ -27,7 +26,8 @@ from django.views.decorators.csrf import csrf_protect
 from .models import NewOfficerRegistration, OfficerLogin,Case
 from .forms_and_validations import officerRegistrationsForms, officer_loginForms,CaseStep1Form, CaseStep2Form, CaseStep3Form
 from .templatetags.custom_filters import calculate_age
-
+from .models import Case
+from .pdf_generator import generate_pdf
 
 
 # Redirection Message after succcesful registrations
@@ -145,60 +145,8 @@ def officer_profile(request):
 
 
 
-@login_required(login_url='officer_login')
-@csrf_protect
-def docketforms(request):
-    # Determine the current step
-    current_step = request.session.get('current_step', 1)
-    
-    if request.method == 'POST':
-        if current_step == 1:
-            form = CaseStep1Form(request.POST)
-            if form.is_valid():
-                request.session['form_step1_data'] = form.cleaned_data
-                request.session['current_step'] = 2
-                return redirect('docketforms')
-        elif current_step == 2:
-            form = CaseStep2Form(request.POST)
-            if form.is_valid():
-                request.session['form_step2_data'] = form.cleaned_data
-                request.session['current_step'] = 3
-                return redirect('docketforms')
-        elif current_step == 3:
-            form = CaseStep3Form(request.POST)
-            if form.is_valid():
-                request.session['form_step3_data'] = form.cleaned_data
-                # Process all data here
-                form_data = {
-                    **request.session.get('form_step1_data', {}),
-                    **request.session.get('form_step2_data', {}),
-                    **request.session.get('form_step3_data', {}),
-                }
-                # Clear session data after processing
-                request.session.flush()
-                # Redirect to a success page or render a success template
-                return render(request, 'success.html', {'form_data': form_data})
-    else:
-        # Initialize the appropriate form based on current step
-        if current_step == 1:
-            form = CaseStep1Form()
-        elif current_step == 2:
-            form = CaseStep2Form()
-        elif current_step == 3:
-            form = CaseStep3Form()
-        else:
-            # Reset to step 1 if current_step is invalid
-            request.session['current_step'] = 1
-            form = CaseStep1Form()
-
-    context = {
-        'form': form,
-        'current_step': current_step,
-    }
-    return render(request, 'docketforms.html', context)
 
 
-@login_required(login_url='officer_login')
 @csrf_exempt
 @require_POST
 def verify_badge(request):
@@ -216,6 +164,7 @@ def verify_badge(request):
 
 
 @login_required(login_url='officer_login')
+@csrf_protect
 def CaseStep1View(request):
     if request.method == 'POST':
         form_step1 = CaseStep1Form(request.POST)
@@ -293,7 +242,6 @@ def CaseStep1View(request):
             request.session['key_witness_contact'] = cleaned_data.get('key_witness_contact')
             request.session['key_witness_physical_address'] = cleaned_data.get('key_witness_physical_address')
             request.session['key_witness_digital_address'] = cleaned_data.get('key_witness_digital_address')
-            print("Form Step 1 Data Stored in Session:", cleaned_data)
 
             # Proceed to the next step
             return redirect('CaseStep2View')
@@ -319,67 +267,104 @@ def CaseStep1View(request):
         'incident_details_fields': incident_details_fields,
         'key_witness_fields': key_witness_fields,
     }
-    return render(request, 'docketforms.html', context)
+    return render(request, 'CaseStep1View.html', context)
 
 
 
 
-# @login_required(login_url='officer_login')
+@login_required(login_url='officer_login')
+@csrf_protect
 def CaseStep2View(request):
-    # Retrieve session data for form initialization
-    complainant_statement = request.session.get('complainant_statement', '')
-    suspect_statement = request.session.get('suspect_statement', '')
-    witness_statement = request.session.get('witness_statement', '')
-    additional_witnesses = request.session.get('additional_witnesses', '')
+    
+    if not request.session.get('Case_Title') or not request.session.get('complainant_name'):
+        # Redirect to Step 1 if data from Step 1 is missing
+        return redirect('CaseStep1View')
+     
+    # Retrieve session data
+    complainant_name = request.session.get('complainant_name', '')
+    complainant_contact = request.session.get('complainant_contact', '')
+    complainant_date_of_birth = request.session.get('complainant_date_of_birth', '')
+    complainant_physical_address = request.session.get('complainant_physical_address', '')
+
+    suspect_name = request.session.get('suspect_name', '')
+    suspect_contact = request.session.get('suspect_contact', '')
+    suspect_date_of_birth = request.session.get('suspect_date_of_birth', '')
+    suspect_physical_address = request.session.get('suspect_physical_address', '')
+
+    key_witness_name = request.session.get('key_witness_name', '')
+    key_witness_contact = request.session.get('key_witness_contact', '')
+    key_witness_age = request.session.get('key_witness_age', '')
+    key_witness_address = request.session.get('key_witness_address', '')
 
     if request.method == 'POST':
-        # Create form instance with POST data
         form_step2 = CaseStep2Form(request.POST)
-        
         if form_step2.is_valid():
-            # Process the valid form data
-            cleaned_data = form_step2.cleaned_data
+            # Process the form data and update session
+            request.session['complainant_statement'] = form_step2.cleaned_data.get('complainant_statement', '')
+            request.session['suspect_statement'] = form_step2.cleaned_data.get('suspect_statement', '')
+            request.session['witness_statement'] = form_step2.cleaned_data.get('witness_statement', '')
+            
+            # Save additional data to session if needed
+            request.session['suspect_name'] = form_step2.cleaned_data.get('suspect_name', suspect_name)
+            request.session['suspect_contact'] = form_step2.cleaned_data.get('suspect_contact', suspect_contact)
+            request.session['suspect_date_of_birth'] = form_step2.cleaned_data.get('suspect_date_of_birth', suspect_date_of_birth)
+            request.session['suspect_physical_address'] = form_step2.cleaned_data.get('suspect_physical_address', suspect_physical_address)
 
-            # Store data in session or process it as needed
-            request.session['complainant_statement'] = cleaned_data.get('complainant_statement')
-            request.session['suspect_statement'] = cleaned_data.get('suspect_statement')
-            request.session['witness_statement'] = cleaned_data.get('witness_statement')
-            request.session['additional_witnesses'] = cleaned_data.get('additional_witnesses')
+            request.session['key_witness_name'] = form_step2.cleaned_data.get('key_witness_name', key_witness_name)
+            request.session['key_witness_contact'] = form_step2.cleaned_data.get('key_witness_contact', key_witness_contact)
+            request.session['key_witness_age'] = form_step2.cleaned_data.get('key_witness_age', key_witness_age)
+            request.session['key_witness_address'] = form_step2.cleaned_data.get('key_witness_address', key_witness_address)
 
-            # For demonstration, you might want to print or log the cleaned data
-            print("Form Step 2 Data Stored in Session:", cleaned_data)
-
-            # Proceed to the next step
-            return redirect('CaseStep3View')  # Adjust this to your next step URL or view
+            return redirect('CaseStep3View')
         else:
-            # Print the form errors for debugging
-            print("Form errors:", form_step2.errors)
             messages.error(request, "Please correct the errors below.")
     else:
-        # Initialize form with prepopulated data from the session
         form_step2 = CaseStep2Form(initial={
-            'complainant_statement': complainant_statement,
-            'suspect_statement': suspect_statement,
-            'witness_statement': witness_statement,
-            'additional_witnesses': additional_witnesses,
+            'complainant_name': complainant_name,
+            'complainant_contact': complainant_contact,
+            'complainant_date_of_birth': complainant_date_of_birth,
+            'complainant_physical_address': complainant_physical_address,
+            'suspect_name': suspect_name,
+            'suspect_contact': suspect_contact,
+            'suspect_date_of_birth': suspect_date_of_birth,
+            'suspect_physical_address': suspect_physical_address,
+            'key_witness_name': key_witness_name,
+            'key_witness_contact': key_witness_contact,
+            'key_witness_age': key_witness_age,
+            'key_witness_address': key_witness_address,
         })
 
-    # Prepare context for rendering the template
     context = {
         'form_step2': form_step2,
+        'complainant_name': complainant_name,
+        'complainant_age': calculate_age(complainant_date_of_birth) if complainant_date_of_birth else '',
+        'complainant_contact': complainant_contact,
+        'complainant_physical_address': complainant_physical_address,
+        'suspect_name': suspect_name,
+        'suspect_age': calculate_age(suspect_date_of_birth) if suspect_date_of_birth else '',
+        'suspect_contact': suspect_contact,
+        'suspect_physical_address': suspect_physical_address,
+        'key_witness_name': key_witness_name,
+        'key_witness_age': key_witness_age,
+        'key_witness_contact': key_witness_contact,
+        'key_witness_address': key_witness_address,
     }
-    print("Context for Step 2:", context)
-    return render(request, 'docketforms.html', context)
+
+    return render(request, 'CaseStep2View.html', context)
 
 
 
 
 
-
-# @login_required(login_url='officer_login')
+@login_required(login_url='officer_login')
+@csrf_protect
 def CaseStep3View(request):
+    # Check if the required session data from Step 2 exists
+    if not request.session.get('case_title'):
+        return redirect('CaseStep1View')
+
     if request.method == 'POST':
-        form = CaseStep3Form(request.POST, request.FILES or None) 
+        form = CaseStep3Form(request.POST, request.FILES or None)
         if form.is_valid():
             # Retrieve data from the session
             case_data = {
@@ -442,7 +427,7 @@ def CaseStep3View(request):
             fingerprint = form.cleaned_data.get('fingerprint')
 
             # Create the Docket instance with all the collected data
-            docket = docketforms.objects.create(**case_data)
+            docket = Case.objects.create(**case_data)
 
             # Save the files if they exist
             if mugshot:
@@ -451,6 +436,9 @@ def CaseStep3View(request):
                 docket.fingerprint = fingerprint
             docket.save()
 
+            # Generate PDF and save it
+            pdf_file_path = generate_pdf(docket)
+            
             # Clear the session after saving
             request.session.flush()
 
@@ -460,4 +448,4 @@ def CaseStep3View(request):
             messages.error(request, "Please correct the errors below.")
     else:
         form = CaseStep3Form()  # Instantiate an empty form for GET requests
-    return render(request, 'docketforms.html', {'form': form})
+    return render(request, 'CaseStep3View.html', {'form': form})

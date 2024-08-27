@@ -1,0 +1,170 @@
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Docket Registration | The Watchtower</title>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.1.0/fonts/remixicon.css" rel="stylesheet"/>
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    {% tailwind_css %}
+    {% load custom_filters %}
+</head>
+
+<body>
+    <div class="min-h-screen py-14 px-36 bg-gray-900 bg-cover bg-center">
+        <div class="max-w-3xl mx-auto p-6 bg-gray-100 rounded-lg shadow-md">
+
+            <div class="justify-center items-center mb-2 flex flex-row bg-blue-950 p-3 rounded-md">
+            <img class="h-12 mr-4" src="{% static 'img/download.png' %}" alt="Your Company">
+            <h2 class="text-3xl text-gray-100 font-bold uppercase">DOCKET REGISTRATION FORMS</h2>
+            </div>
+        
+
+            <!-- Stepper Reading Button -->
+            <ol id="stepper" class="flex flex-wrap mx-auto w-full items-center justify-center p-2 space-x-2 text-sm font-medium text-center text-gray-500 bg-white border border-gray-200 mb-4 shadow-sm dark:text-gray-400 sm:text-base dark:bg-gray-800 dark:border-gray-700 sm:p-4 rtl:space-x-reverse">
+                <a href="{% url 'selectPurpose' %}" class="flex items-center text-gray-500 dark:text-gray-400 whitespace-nowrap cursor-pointer mr-4">
+                    <div><i class="ri-home-8-line text-2xl"></i></div>
+                </a>
+                <li data-step="3" class="flex items-center text-blue-600 dark:text-blue-500 whitespace-nowrap cursor-pointer">
+                    <span class="flex items-center justify-center w-4 h-4 me-2 text-xs border border-blue-600 rounded-full shrink-0 dark:border-blue-500">3</span>
+                    Attachments & Submission
+                    <svg class="w-3 h-3 ms-2 sm:ms-3 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 12 10">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m7 9 4-4-4-4M1 9l4-4-4-4"/>
+                    </svg>
+                </li> 
+            </ol> 
+            <!-- End of Stepper Reading Button
+
+
+    
+            <!-Content for Step 3 -->
+            <div id="stepGroup3" class="step-group bg-red-200" data-step-group="3">
+            <form method="post" action="{% url 'CaseStep3View' %}" id="form_step3_submit">
+                {% csrf_token %}
+
+     <!-- officer_profile.html -->
+
+<!-- Reporting Officer Information Section -->
+<div class="mb-8 bg-red-200 p-3">
+    <h3 class="text-xl font-semibold text-gray-700 mb-4">Reporting Officer</h3>
+    <div class="flex flex-wrap gap-4">
+        <div class="flex flex-col">
+            <label class="block text-sm font-medium text-gray-700">Officer Name</label>
+            <p class="mt-1 text-xs text-gray-500">
+                {{ officer_profile.first_name }} {{ officer_profile.last_name }}
+            </p>
+        </div>
+        <div class="flex flex-col">
+            <label class="block text-sm font-medium text-gray-700">Badge/ID Number</label>
+            <p class="mt-1 text-xs text-gray-500">
+                {{ badge_number }}
+            </p>
+        </div>
+        <div class="flex flex-col">
+            <label class="block text-sm font-medium text-gray-700">Rank</label>
+            <p class="mt-1 text-xs text-gray-500">
+                {{ rank }}
+            </p>
+        </div>
+        <div class="flex flex-col">
+            <label class="block text-sm font-medium text-gray-700">Station/Post</label>
+            <p class="mt-1 text-xs text-gray-500">
+                {{ station }}
+            </p>
+        </div>
+        <div class="flex flex-col">
+            <label class="block text-sm font-medium text-gray-700">Division</label>
+            <p class="mt-1 text-xs text-gray-500">
+                {{ division }}
+            </p>
+        </div>
+    </div>
+</div>
+
+
+            <!-- Legal and Procedural Information Section -->
+            <div class="mb-4 p-3">
+                <h3 class="text-xl font-semibold text-gray-700 mb-4">Legal and Procedural Information</h3>
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Charges Filed</label>
+                        <input type="text" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500" placeholder="List charges">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Legal Actions Taken</label>
+                        <input type="text" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Describe legal actions">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Assigned Investigator</label>
+                        <input type="text" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Investigator name">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Case Status</label>
+                        <select class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option>Open</option>
+                            <option>Under Investigation</option>
+                            <option>Closed</option>
+                        </select>
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-sm font-medium text-gray-700">Follow-Up Required</label>
+                        <textarea class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500" rows="3" placeholder="Notes on follow-up actions"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Notes Section -->
+            <div class="mb-8 p-3">
+                <h3 class="text-xl font-semibold text-gray-700 mb-4">Additional Notes</h3>
+                <textarea class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500" rows="4" placeholder="Enter additional observations or comments"></textarea>
+            </div>
+
+            <!-- Attachments Section -->
+            <!-- Mugshot Upload Section -->
+        <div class="mb-8 p-3">
+            <h3 class="text-xl font-semibold text-gray-700 mb-4">Mugshot Upload</h3>
+            <div class="flex flex-col items-center border-2 border-dashed border-gray-400 p-6 rounded-md">
+                <svg class="w-12 h-12 text-gray-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l5-5 5 5H7z"></path>
+                </svg>
+                <p class="text-gray-700">Choose file to upload</p>
+                <p class="text-xs text-gray-500">Supported formats: JPEG, PNG</p>
+                <input type="file" class="mt-2 block w-full text-gray-500 p-2" accept=".jpg, .jpeg, .png">
+            </div>
+        </div>
+
+        <!-- Fingerprint Upload Section -->
+        <div class="mb-8 p-3">
+            <h3 class="text-xl font-semibold text-gray-700 mb-4">Fingerprint Upload</h3>
+            <div class="flex flex-col items-center border-2 border-dashed border-gray-400 p-6 rounded-md">
+                <svg class="w-12 h-12 text-gray-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l5-5 5 5H7z"></path>
+                </svg>
+                <p class="text-gray-700">Choose file to upload</p>
+                <p class="text-xs text-gray-500">Supported formats: PDF, DOC, DOCX</p>
+                <input type="file" class="mt-2 block w-full text-gray-500 p-2" accept=".pdf, .doc, .docx">
+            </div>
+        </div>
+
+        <div class="bg-gray-300 mt-12 mb-4">
+            <div class="flex justify-between">
+                <!-- Back Button -->
+                <button type="button" id="backButton" class="bg-gray-600 hover:bg-gray-500 text-white font-semibold py-2 px-4 rounded-md shadow-sm">Back</button>
+                <!-- Continue Button -->
+                <button type="submit" id="continueButton" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 px-4 rounded-md shadow-sm">Continue</button>
+            </div>
+            </div>
+            </form>
+            </div> 
+
+    </div> 
+    </div>
+    </div>
+
+
+<script>
+</script>
+</body>
+</html>

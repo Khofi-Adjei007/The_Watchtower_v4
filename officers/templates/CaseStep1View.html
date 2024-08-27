@@ -1,0 +1,343 @@
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Docket Registration | The Watchtower</title>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.1.0/fonts/remixicon.css" rel="stylesheet"/>
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    {% tailwind_css %}
+    {% load custom_filters %}
+</head>
+
+<body>
+    <div class="min-h-screen py-14 px-36 bg-gray-900 bg-cover bg-center">
+        <div class="max-w-3xl mx-auto p-6 bg-gray-100 rounded-lg shadow-md">
+
+            <div class="justify-center items-center mb-2 flex flex-row bg-blue-950 p-3 rounded-md">
+            <img class="h-12 mr-4" src="{% static 'img/download.png' %}" alt="Your Company">
+            <h2 class="text-3xl text-gray-100 font-bold uppercase">DOCKET REGISTRATION FORMS</h2>
+            </div>
+        
+
+            <!-- Stepper Reading Button -->
+            <ol id="stepper" class="flex flex-wrap mx-auto w-full items-center justify-center p-2 space-x-2 text-sm font-medium text-center text-gray-500 bg-white border border-gray-200 mb-4 shadow-sm dark:text-gray-400 sm:text-base dark:bg-gray-800 dark:border-gray-700 sm:p-4 rtl:space-x-reverse">
+                <a href="{% url 'selectPurpose' %}" class="flex items-center text-gray-500 dark:text-gray-400 whitespace-nowrap cursor-pointer mr-4">
+                    <div><i class="ri-home-8-line text-2xl"></i></div>
+                </a>
+                <li data-step="3" class="flex items-center text-blue-600 dark:text-blue-500 whitespace-nowrap cursor-pointer">
+                    <span class="flex items-center justify-center w-4 h-4 me-2 text-xs border border-blue-600 rounded-full shrink-0 dark:border-blue-500">1</span>
+                    General & Bio Data
+                    <svg class="w-3 h-3 ms-2 sm:ms-3 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 12 10">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m7 9 4-4-4-4M1 9l4-4-4-4"/>
+                    </svg>
+                </li> 
+            </ol> 
+            <!-- End of Stepper Reading Button
+
+
+            <!-Content for Step 1 -->
+            <div id="stepGroup1" class="step-group form_step1" data-step-group="1">
+            <div class="mb-8 bg-green-200 p-3">
+            <form method="post" action="{% url 'CaseStep1View' %}" class="form_step1" novalidate>
+            <div class="grid grid-cols-2 gap-6 sm:grid-cols-1">
+
+                    {% csrf_token %}
+                    <!-- General Case Information -->
+                    <div class="mt-4">
+                        <!-- General Case Information Header -->
+                        <div class="relative flex items-center mb-4">
+                            <span class="relative px-4 text-white font-bold italic bg-blue-950">Title, Timestamps</span>
+                            <div class="flex-grow border-t border-gray-300"></div>
+                        </div>
+
+                        <!-- General Case Information Fields -->
+                        <div class="flex flex-col-2 gap-2">
+                            {% for field in form_step1 %}
+                                {% if field.name == 'Case_Title' or field.name == 'date_time_of_incident' or field.name == 'date_time_of_report' %}
+                                <div>
+                                    <!-- Error Display -->
+                                    {% if form_step1.is_bound and field.errors %}
+                                        <div class="text-red-600 text-sm mb-2">
+                                            {% for error in field.errors %}
+                                            <p>{{ error }}</p>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    <!-- Field Label and Input -->
+                                    <label for="{{ field.id_for_label }}" class="block text-gray-700 font-semibold">
+                                        {{ field.label_tag }}
+                                    </label>
+                                    {{ field }}
+                                </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div> 
+                    </div>
+                <!-- Complainant Information -->
+                <div class="mt-8">
+                <!-- Complainant Information Header -->
+                <div class="relative flex items-center mb-4">
+                    <span class="relative px-4 text-white font-bold italic bg-green-600">Complainant Data</span>
+                    <div class="flex-grow border-t border-gray-300"></div>
+                </div>
+                <!-- Complainant Information Fields -->
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        {% for field in form_step1 %}
+                            {% if field.name|slice:":12" == "complainant_" %}
+                                <div>
+                                    <label for="{{ field.id_for_label }}" class="block text-gray-700 font-semibold">
+                                        {{ field.label_tag }}
+                                                <!-- Error Display -->
+                                    {% if form_step1.is_bound and field.errors %}
+                                    <div class="text-red-600 text-sm mb-2">
+                                        {% for error in field.errors %}
+                                            <p>{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                    </label>
+                                    {{ field }}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                  
+                <!-- Suspect Information -->
+                <div class="mt-8">
+                  <!-- Suspect Information Header -->
+                <div class="relative flex items-center mb-4">
+                    <span class="relative px-4 text-white font-bold italic bg-yellow-500">Suspect Data</span>
+                    <div class="flex-grow border-t border-gray-300"></div>
+                </div>
+                    <!-- Suspect Information Fields -->
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        {% for field in form_step1 %}
+                            {% if field.name|slice:":8" == "suspect_" %}
+                                <div>
+                                <label for="{{ field.id_for_label }}" class="block text-gray-700 font-semibold">
+                                    {{ field.label_tag }}
+                                            <!-- Error Display -->
+                                            {% if form_step1.is_bound and field.errors %}
+                                            <div class="text-red-600 text-sm mb-2">
+                                                {% for error in field.errors %}
+                                                    <p>{{ error }}</p>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </label>
+                                    {{ field }}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>      
+                <!-- Victim Information -->
+                <div class="mt-8">
+                  <!-- Victim Information Header -->
+                <div class="relative flex items-center mb-4">
+                    <span class="relative px-4 text-white font-bold italic bg-red-600">Victim Data</span>
+                    <div class="flex-grow border-t border-gray-300"></div>
+                </div>
+                <div class="flex items-center mb-4">
+                    <label class="mr-4">Is the Victim the Same as the Complainant?</label>
+                    <div class="flex items-center mr-4">
+                    <input id="sameVictim" name="victimSameAsComplainant" type="radio" class="mr-2" value="same">
+                    <label for="sameVictim" class="text-sm font-medium text-gray-700">Yes</label>
+                    </div>
+                    <div class="flex items-center">
+                    <input id="differentVictim" name="victimSameAsComplainant" type="radio" class="mr-2" value="different">
+                    <label for="differentVictim" class="text-sm font-medium text-gray-700">No</label>
+                    </div>
+                </div>
+                    <!-- Victim Information Fields -->
+                    <div id="victimInfoForm" class="grid grid-cols-1 gap-4 sm:grid-cols-2 hidden">
+                        {% for field in form_step1 %}
+                            {% if field.name|slice:":7" == "victim_" %}
+                                <div>
+                                <label for="{{ field.id_for_label }}" class="block text-gray-700 font-semibold">
+                                {{ field.label_tag }}
+                                        <!-- Error Display -->
+                                        {% if form_step1.is_bound and field.errors %}
+                                        <div class="text-red-600 text-sm mb-2">
+                                            {% for error in field.errors %}
+                                                <p>{{ error }}</p>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </label>
+                                {{ field }}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                    
+                <!-- Incident Details -->
+                <div class="mt-8">
+                <!-- Incident Details Header -->
+                <div class="relative flex items-center mb-4">
+                    <span class="relative px-4 text-white font-bold italic bg-purple-600">Incident Details</span>
+                    <div class="flex-grow border-t border-gray-300"></div>
+                </div>
+                    <!-- Incident Details Fields -->
+                    <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                        {% for field in form_step1 %}
+                            {% if field.name == 'location_of_incident' or field.name == 'type_of_incident' %}
+                                <div>
+                                    <label for="{{ field.id_for_label }}" class="block text-gray-700 font-semibold">
+                                        {{ field.label_tag }}
+                                                <!-- Error Display -->
+                                    {% if form_step1.is_bound and field.errors %}
+                                    <div class="text-red-600 text-sm mb-2">
+                                        {% for error in field.errors %}
+                                            <p>{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                    </label>
+                                    {{ field }}
+                                </div>
+                            {% elif field.name == 'statement_of_incident' %}
+                                <div class="sm:col-span-2">
+                                    <label for="{{ field.id_for_label }}" class="block text-gray-700 font-semibold">
+                                        {{ field.label_tag }}
+                                    </label>
+                                    {{ field }}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- Key Witness Information -->
+                <div class="mt-8">
+                    <!-- Key Witness Information Header -->
+                    <div class="relative flex items-center mb-6">
+                        <span class="relative px-4 text-white font-bold italic bg-orange-600">Key Witness</span>
+                        <div class="flex-grow border-t border-gray-300"></div>
+                    </div>
+                    <!-- Key Witness Information Fields -->
+                    <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                        {% for field in form_step1 %}
+                            {% if field.name|startswith:"key_witness_" %}
+                                <div>
+                                    <label for="{{ field.id_for_label }}" class="block text-gray-700 font-semibold">
+                                        {{ field.label_tag }}
+                                                <!-- Error Display -->
+                                    {% if form_step1.is_bound and field.errors %}
+                                    <div class="text-red-600 text-sm mb-2">
+                                        {% for error in field.errors %}
+                                            <p>{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                    </label>
+                                    {{ field }}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+                <div class="bg-gray-300 mt-6 mb-4">
+                <div class="flex justify-between">
+                    <!-- Back Button -->
+                    <button type="button" id="backButton" class="bg-gray-600 hover:bg-gray-500 text-white font-semibold py-2 px-4 rounded-md shadow-sm">Back</button>
+                    <!-- Continue Button -->
+                    <button type="submit" id="continueButton" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 px-4 rounded-md shadow-sm">Continue</button>
+                </div>
+                </div>
+                
+            </form>
+                </div>    
+            </div>
+    </div> 
+    </div>
+    </div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Function to control the visibility of the victim toggle
+    const victimToggle = () => {
+        const sameVictimRadio = document.getElementById('sameVictim');
+        const differentVictimRadio = document.getElementById('differentVictim');
+        const victimInfoForm = document.getElementById('victimInfoForm');
+        
+        const victimFields = {
+            name: document.getElementById('id_victim_name'),
+            contact: document.getElementById('id_victim_contact'),
+            physical_address: document.getElementById('id_victim_physical_address'),
+            digital_address: document.getElementById('id_victim_digital_address'),
+            occupation: document.getElementById('id_victim_occupation'),
+            date_of_birth: document.getElementById('id_victim_date_of_birth')
+        };
+
+        const complainantFields = {
+            name: document.getElementById('id_complainant_name'),
+            contact: document.getElementById('id_complainant_contact'),
+            physical_address: document.getElementById('id_complainant_physical_address'),
+            digital_address: document.getElementById('id_complainant_digital_address'),
+            occupation: document.getElementById('id_complainant_occupation'),
+            date_of_birth: document.getElementById('id_complainant_date_of_birth')
+        };
+
+        sameVictimRadio.addEventListener('click', function() {
+            victimInfoForm.classList.add('hidden');
+            Object.keys(victimFields).forEach(field => {
+                victimFields[field].value = complainantFields[field].value;
+                victimFields[field].removeAttribute('required');
+            });
+        });
+
+        differentVictimRadio.addEventListener('click', function() {
+            victimInfoForm.classList.remove('hidden');
+            Object.keys(victimFields).forEach(field => {
+                victimFields[field].value = '';
+                victimFields[field].setAttribute('required', 'required');
+            });
+        });
+    };
+
+    // Initialize victim toggle functionality
+    victimToggle();
+});
+
+
+    // Witness box and addition
+    let witnessCount = 0;
+    const maxWitnesses = 5;
+    document.getElementById('addWitnessButton').addEventListener('click', function() {
+        if (witnessCount < maxWitnesses) {
+            witnessCount++;
+
+            // Clone the hidden witness box and make it visible
+            const witnessContainer = document.getElementById('witnessContainer');
+            const newWitness = document.getElementById('hiddenWitness').cloneNode(true);
+            newWitness.id = `witness${witnessCount}`; // Give each witness box a unique ID
+            newWitness.classList.remove('hidden');
+            
+            // Update the label and placeholder text to reflect the new witness
+            newWitness.querySelector('label').textContent = `Witness ${witnessCount} Statement`;
+            newWitness.querySelector('textarea').placeholder = `Please provide a detailed account of the incident by witness ${witnessCount}.`;
+            
+            // Append the new witness box to the witness container
+            witnessContainer.appendChild(newWitness);
+        } else {
+            // Display the message when the limit is reached
+            const messageElement = document.getElementById('witnessLimitMessage');
+            messageElement.textContent = "Witness limit reached.";
+            messageElement.classList.remove('hidden');
+        }
+    });
+
+
+</script>
+</body>
+</html>

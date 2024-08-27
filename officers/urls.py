@@ -13,7 +13,6 @@ urlpatterns = [
     path('officer_profile/', views.officer_profile, name='officer_profile'),
     path('officer_logout/', views.officer_logout, name='officer_logout'),
     path('verify_badge/', verify_badge, name='verify_badge'),
-    path('docketforms/', views.docketforms, name='docketforms'),
     path('searchdatabase/', views.searchdatabase, name='searchdatabase'),
     path('casesProgress/', views.casesProgress, name='casesProgress'),
     path('commandmessaging/', views.commandmessaging, name='commandmessaging'),

@@ -1,0 +1,228 @@
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Docket Registration | The Watchtower</title>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.1.0/fonts/remixicon.css" rel="stylesheet"/>
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    {% tailwind_css %}
+    {% load custom_filters %}
+</head>
+
+<body>
+    <div class="min-h-screen py-14 px-36 bg-gray-900 bg-cover bg-center">
+        <div class="max-w-3xl mx-auto p-6 bg-gray-100 rounded-lg shadow-md">
+
+            <div class="justify-center items-center mb-6 flex flex-row bg-blue-950 p-3 rounded-md">
+            <img class="h-12 mr-4" src="{% static 'img/download.png' %}" alt="Your Company">
+            <h2 class="text-3xl text-gray-100 font-bold uppercase">DOCKET REGISTRATION FORMS</h2>
+            </div>
+        
+
+            <!-- Stepper Reading Button -->
+            <ol id="stepper" class="flex flex-wrap mx-auto w-full items-center justify-center p-2 space-x-2 text-sm font-medium text-center text-gray-500 bg-white border border-gray-200 mb-4 shadow-sm dark:text-gray-400 sm:text-base dark:bg-gray-800 dark:border-gray-700 sm:p-4 rtl:space-x-reverse">
+                <a href="{% url 'selectPurpose' %}" class="flex items-center text-gray-500 dark:text-gray-400 whitespace-nowrap cursor-pointer mr-4">
+                    <div>
+                    <i class="ri-home-8-line text-2xl"></i>
+                    </div>
+                </a>
+                <li data-step="2" class="flex items-center text-red-500 dark:text-gray-400 whitespace-nowrap cursor-pointer">
+                    <span class="flex items-center justify-center w-4 h-4 me-2 text-xs border border-gray-500 rounded-full shrink-0 dark:border-gray-400">2</span>
+                    Statement By All Parties Involved
+                    <svg class="w-3 h-3 ms-2 sm:ms-3 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 12 10">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m7 9 4-4-4-4M1 9l4-4-4-4"/>
+                    </svg>
+                </li>
+            </ol> 
+            <!-- End of Stepper Reading Button
+
+
+            
+
+             <!-Content for Step 2 -->
+            <div id="stepGroup2" class="step-group bg-yellow-100 p-3 mb-4" data-step-group="2" novalidate>
+                <div id="stepGroup2" class="step-group bg-yellow-100 p-3 mb-4" data-step-group="2" novalidate>
+                    <form method="post" action="{% url 'CaseStep2View' %}" novalidate>
+                        {% csrf_token %}
+            
+                        <div class="col-span-2">
+                            <!-- Complainant Statement Header -->
+                            <div class="relative flex items-center mb-4">
+                                <span class="relative px-4 text-white font-bold italic bg-green-600">
+                                    Statement By <span class="text-blue-200">{{ complainant_name }}</span> (Complainant)
+                                </span>
+                                <div class="flex-grow border-t border-gray-300"></div>
+                            </div>
+            
+                            <!-- Complainant Information in Horizontal Layout -->
+                            <div class="flex flex-wrap mt-1 text-sm text-gray-600 space-x-4">
+                                <p><strong>Name:</strong> <span id="complainantName" class="text-blue-600">{{ complainant_name }}</span></p>
+                                <p><strong>Age:</strong> <span id="complainantAge" class="text-blue-600">{{ complainant_date_of_birth|calculate_age }}</span></p>
+                                <p><strong>Contact:</strong> <span id="complainantContact" class="text-blue-600">{{ complainant_contact }}</span></p>
+                                <p><strong>Address:</strong> <span id="complainantAddress" class="text-blue-600">{{ complainant_physical_address }}</span></p>
+                            </div>
+            
+                            <!-- Complainant Statement -->
+                            <div>
+                                {{ form_step2.complainant_statement }}
+                            </div>
+                            <p class="mt-1 text-xs text-gray-500">
+                                This appears to be {{ complainant_name }}'s first time with The Watchtower. I found nothing of interest on her. 
+                                <a href="#" class="text-blue-600 hover:underline">---Read more---</a>
+                            </p>
+                        </div>
+            
+                        <div class="col-span-2">
+                            <!-- Suspect Statement Header -->
+                            <div class="relative flex items-center mb-4 mt-10">
+                                <span class="relative px-4 text-white font-bold italic bg-red-600">
+                                    Statement By <span class="text-red-200">{{ suspect_name }}</span> (Suspect)
+                                </span>
+                                <div class="flex-grow border-t border-gray-300"></div>
+                            </div>
+            
+                            <!-- Suspect Information in Horizontal Layout -->
+                            <div class="flex flex-wrap mt-1 text-sm text-gray-600 space-x-4">
+                                <p><strong>Name:</strong> <span id="suspectName" class="text-red-600">{{ suspect_name }}</span></p>
+                                <p><strong>Age:</strong> <span id="suspectAge" class="text-red-600">{{ suspect_date_of_birth|calculate_age }}</span></p>
+                                <p><strong>Contact:</strong> <span id="suspectContact" class="text-red-600">{{ suspect_contact }}</span></p>
+                                <p><strong>Address:</strong> <span id="suspectAddress" class="text-red-600">{{ suspect_physical_address }}</span></p>
+                            </div>
+            
+                            <!-- Suspect Statement -->
+                            {{ form_step2.suspect_statement }}
+                            <p class="mt-1 text-xs text-gray-500">
+                                James Powah was last arrested at the Tesano police station for possessing weed. He was sentenced for 90 days. He, however, has no case of robbery as stated here. 
+                                <a href="#" class="text-blue-600 hover:underline">---Read more about James---</a>
+                            </p>
+                        </div>
+            
+                        <div class="col-span-2">
+                            <!-- Witness Statement Header -->
+                            <div class="relative flex items-center mb-4 mt-10">
+                                <span class="relative px-4 text-white font-bold italic bg-orange-500">
+                                    Statement By <span class="text-green-200">{{ key_witness_name }}</span> (Key Witness)
+                                </span>
+                                <div class="flex-grow border-t border-gray-300"></div>
+                            </div>
+            
+                            <!-- Witness Information in Horizontal Layout -->
+                            <div class="flex flex-wrap mt-1 text-sm text-gray-600 space-x-4">
+                                <p><strong>Name:</strong> <span id="witnessName" class="text-red-600">{{ key_witness_name }}</span></p>
+                                <p><strong>Age:</strong> <span id="witnessAge" class="text-red-600">{{ key_witness_age }}</span></p>
+                                <p><strong>Contact:</strong> <span id="witnessContact" class="text-red-600">{{ key_witness_contact }}</span></p>
+                                <p><strong>Address:</strong> <span id="witnessAddress" class="text-red-600">{{ key_witness_address }}</span></p>
+                            </div>
+            
+                            <!-- Witness Statement -->
+                            <div>
+                                {{ form_step2.witness_statement }}
+                            </div>
+                            <p class="mt-1 text-xs text-gray-500">
+                                This is Asiama's third time being a witness to a case. Does that guy have a job at all? Tell him to go get a job. Jesus Christ.
+                                <a href="#" class="text-blue-600 hover:underline">---Read more about Asiama---</a>
+                            </p>
+                        </div>
+            
+                        <!-- Add Witness Button -->
+                        <div class="flex items-center mt-10 mb-1" id="addWitnessButton">
+                            <div class="flex-grow border-t border-gray-300"></div>
+                            <span class="px-4 text-gray-700 font-bold italic">Add Another Witness</span>
+                            <div class="flex-grow border-t border-gray-300"></div>
+                        </div>
+            
+                        <!-- Witness Container -->
+                        <div id="witnessContainer">
+                            <!-- Hidden witness statement box -->
+                            <div id="hiddenWitness" class="col-span-2 mb-4 hidden">
+                                <label class="block text-sm font-medium text-gray-700">Additional Witness Statement</label>
+                                <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Witness Name</label>
+                                        {{ form_step2.witness_name }}
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Witness Contact</label>
+                                        {{ form_step2.witness_contact }}
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Witness Physical Address</label>
+                                        {{ form_step2.witness_physical_address }}
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Witness Digital Address</label>
+                                        {{ form_step2.witness_digital_address }}
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Witness Date of Birth</label>
+                                        {{ form_step2.witness_date_of_birth }}
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Witness Occupation</label>
+                                        {{ form_step2.witness_occupation }}
+                                    </div>
+                                </div>
+                                {{ form_step2.witness_statement }}
+                                <p class="mt-1 text-xs text-gray-500">Include as much detail as possible.</p>
+                            </div>
+                        </div>
+            
+                        <!-- Witness Limit Message -->
+                        <p id="witnessLimitMessage" class="hidden text-red-600 text-sm mt-2"></p>
+            
+                        <div class="bg-gray-300 mt-6 mb-4">
+                            <div class="flex justify-between">
+                                <!-- Back Button -->
+                                <button type="button" id="backButton" class="bg-gray-600 hover:bg-gray-500 text-white font-semibold py-2 px-4 rounded-md shadow-sm">Back</button>
+                                <!-- Continue Button -->
+                                <button type="submit" id="continueButton" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 px-4 rounded-md shadow-sm">Continue</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            
+            </div>
+
+
+           
+           
+    </div> 
+    </div>
+    </div>
+
+
+<script>
+    // Witness box and addition
+    let witnessCount = 0;
+    const maxWitnesses = 5;
+    document.getElementById('addWitnessButton').addEventListener('click', function() {
+        if (witnessCount < maxWitnesses) {
+            witnessCount++;
+
+            // Clone the hidden witness box and make it visible
+            const witnessContainer = document.getElementById('witnessContainer');
+            const newWitness = document.getElementById('hiddenWitness').cloneNode(true);
+            newWitness.id = `witness${witnessCount}`; // Give each witness box a unique ID
+            newWitness.classList.remove('hidden');
+            
+            // Update the label and placeholder text to reflect the new witness
+            newWitness.querySelector('label').textContent = `Witness ${witnessCount} Statement`;
+            newWitness.querySelector('textarea').placeholder = `Please provide a detailed account of the incident by witness ${witnessCount}.`;
+            
+            // Append the new witness box to the witness container
+            witnessContainer.appendChild(newWitness);
+        } else {
+            // Display the message when the limit is reached
+            const messageElement = document.getElementById('witnessLimitMessage');
+            messageElement.textContent = "Witness limit reached.";
+            messageElement.classList.remove('hidden');
+        }
+    });
+
+
+</script>
+</body>
+</html>
