@@ -5,6 +5,7 @@ from datetime import datetime
 from django.utils import timezone
 from datetime import datetime
 import pytz
+from datetime import date
 
 
 from django import forms
@@ -172,82 +173,62 @@ class officer_loginForms(forms.Form):
 #Start of 3-Stepper Forms Validation logics
 class CaseStep1Form(forms.Form):
 
-    Case_Title = forms.CharField(
-        required=False,
-        max_length=250,
-        label="Case Title/Description",
-        widget=forms.TextInput(attrs={
-            'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
-            'placeholder': 'Enter case title'
-        })
-    )
-
-
-    def clean_case_title(self):
-        case_title = self.cleaned_data.get('case_title')
-        if case_title and not re.match(r'^[a-zA-Z\s]*$', case_title):
+    """ Case Identitfy Section"""
+    Initial_Case_Title = forms.CharField(required=True, max_length=250, label="Initial Case Title",
+                                 widget=forms.TextInput(attrs={'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
+                                                               'placeholder': 'Initial Case Title'}))
+    def clean_Initial_Case_Title(self):
+        Initial_Case_Title = self.cleaned_data.get('Case_Title')
+        if Initial_Case_Title and not re.match(r'^[a-zA-Z\s]*$', Initial_Case_Title):
             raise forms.ValidationError("Enter a valid case title.")
-        return case_title
+        return Initial_Case_Title
 
-    date_time_of_incident = forms.DateTimeField(
-        label="Date & Time Of Incident",
-        error_messages={'required': 'Indicate Time and Date'},
-        widget=forms.DateTimeInput(attrs={
-            'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
-            'placeholder': 'YYYY-MM-DD HH:MM:SS',
-            'type': 'datetime-local'
-        }),
-    )
 
+    date_time_of_incident = forms.DateTimeField(label="Date & Time It Happened", error_messages={'required': 'Indicate Time and Date'},
+        widget=forms.DateTimeInput(attrs={'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
+                                          'placeholder': 'YYYY-MM-DD HH:MM:SS',
+                                          'type': 'datetime-local'}),)
     def clean_date_time_of_incident(self):
         date_time_of_incident = self.cleaned_data.get('date_time_of_incident')
         # Custom validation logic, e.g., ensuring the date is not in the future
         return date_time_of_incident
+    
 
-    date_time_of_report = forms.DateTimeField(
-        label="Date & Time of Report",
-        required=True,
-        widget=forms.DateTimeInput(attrs={
-            'type': 'datetime-local',
-            'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
-            'placeholder': 'YYYY-MM-DD HH:MM'
-        }),
-        error_messages={'required': 'Indicate Time and Date'}
-    )
-
+    date_time_of_report = forms.DateTimeField(label="Date & Time You're Reporting",required=True,
+                                widget=forms.DateTimeInput(attrs={'type': 'datetime-local',
+                                                'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
+                                                'placeholder': 'YYYY-MM-DD HH:MM'}),
+                                                error_messages={'required': 'Indicate Time and Date'})
     def clean_date_time_of_report(self):
         date_time_of_report = self.cleaned_data.get('date_time_of_report')
-    
         if not date_time_of_report:
             raise ValidationError("Date & Time of Report is required.")
         
         # Get the current time as timezone-aware
         now = timezone.now()
-        
+
         # Make date_time_of_report timezone-aware if it's naive
         if timezone.is_naive(date_time_of_report):
             local_timezone = timezone.get_current_timezone()
             date_time_of_report = local_timezone.localize(date_time_of_report)
-        
+    
         # Compare report time with the current time
         if date_time_of_report > now:
             raise ValidationError("The report date cannot be in the future.")
-        
         return date_time_of_report
     
-    complainant_name = forms.CharField(
-        label="Enter Complainant Name",
-        max_length=100,
-        error_messages={
-            'required': 'Complainant name is required',
-            'invalid': 'Name is invalid'
-        },
-        widget=forms.TextInput(attrs={
-            'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
-            'placeholder': "complainant's name"
-        })
-    )
+    """End of Case Identifications and Timestamps"""
 
+
+
+
+    """ complainant information section """
+
+    complainant_name = forms.CharField(label="Complainant Name",
+        max_length=100,error_messages={'required': 'Complainant name is required',
+                                       'invalid': 'Name is invalid'},
+        widget=forms.TextInput(attrs={'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
+                                      'placeholder': "complainant's name"}))
     def clean_complainant_name(self):
         complainant_name = self.cleaned_data.get('complainant_name')
         if not complainant_name:
@@ -255,133 +236,93 @@ class CaseStep1Form(forms.Form):
         elif not re.match(r'^[a-zA-Z\s]*$', complainant_name):
             raise forms.ValidationError("Enter a valid complainant name.")
         return complainant_name
-
+    
     complainant_contact = forms.CharField(
-        label="Complainant Contact",
-        max_length=15,
-        required=True,
-        widget=forms.TextInput(attrs={
+        label="Complainant Contact",max_length=10, required=True, widget=forms.TextInput(attrs={
             'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
-            'placeholder': 'e.g., +1234567890'
-        }),
-        error_messages={
-            'required': 'Phone number is required.',
-            'max_length': 'Phone number is too long.'
-        }
-    )
-
+            'placeholder': 'e.g., +1234567890'}),
+        error_messages={'required': 'Phone number is required.', 'max_length': 'Phone number is too long.'})
     def clean_complainant_contact(self):
         complainant_contact = self.cleaned_data.get('complainant_contact')
         phone_pattern = re.compile(r'^\+?\d{7,15}$')
         if not phone_pattern.match(complainant_contact):
-            raise ValidationError("Enter a valid phone number with 7 to 15 digits.")
+            raise ValidationError("Enter a valid phone number of 10 digits.")
         return complainant_contact
 
-    
-
-    complainant_physical_address = forms.CharField(
-    label="Complainant Physical Address",
-    max_length=100,
-    error_messages={
-        'required': 'Complainant physical address is required.',
-        'invalid': 'Address is invalid.'
-    },
+    complainant_address = forms.CharField(label="Complainant Address", max_length=100, error_messages={
+        'required': 'Complainant address is required.',
+        'invalid': 'Address is invalid.'},
     widget=forms.TextInput(attrs={
         'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
-        'placeholder': 'Complainant\'s physical address'
-    })
-)
-
+        'placeholder': 'Complainant\'s address'}))
     def clean_complainant_physical_address(self):
-        complainant_physical_address = self.cleaned_data.get('complainant_physical_address')
+        complainant_physical_address = self.cleaned_data.get('complainant_address')
         if not complainant_physical_address:
-            raise forms.ValidationError("Complainant physical address cannot be empty.")
-        elif not re.match(r'^[\w\s.,-]*$', complainant_physical_address):  # Allows letters, numbers, spaces, and common address characters
+            raise forms.ValidationError("Complainant address cannot be empty.")
+        elif not re.match(r'^[\w\s.,-]*$', complainant_physical_address):
             raise forms.ValidationError("Enter a valid address.")
         return complainant_physical_address
 
-
-    complainant_digital_address = forms.CharField(
-        label="Complainant Digital Address",
-        max_length=100,
-        error_messages={
-            'required': 'Complainant digital address is required.',
-            'invalid': 'Digital address is invalid.'
-        },
+    complainant_identification_card = forms.CharField(label="Complainant Identification No.", max_length=100,
+                                                      error_messages={'required': 'Complainant identification No. is required.',
+                                                                      'invalid': 'Digital address is invalid.'},
         widget=forms.TextInput(attrs={
             'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
-            'placeholder': 'Complainant\'s digital address (e.g., email or social media handle)'
-        })
-    )
-
+            'placeholder': 'Complainant\'s Gh Card No'}))
     def clean_complainant_digital_address(self):
         complainant_digital_address = self.cleaned_data.get('complainant_digital_address')
         if not complainant_digital_address:
-            raise forms.ValidationError("Complainant digital address cannot be empty.")
-        elif not re.match(r'^[\w@.-]+$', complainant_digital_address):  # Simplified for digital addresses
-            raise forms.ValidationError("Enter a valid digital address (e.g., email or social media handle).")
+            raise forms.ValidationError("Complainant identification No cannot be empty.")
+        elif not re.match(r'^[\w@.-]+$', complainant_digital_address):
+            raise forms.ValidationError("Enter a valid Complainant identification No")
         return complainant_digital_address
 
-
-    complainant_occupation = forms.CharField(
-        label="Complainant Occupation",
-        max_length=100,
-        error_messages={
+    complainant_occupation = forms.CharField(label="Complainant Occupation",max_length=100,error_messages={
             'required': 'Complainant occupation is required.',
-            'invalid': 'Occupation is invalid.'
-        },
-        widget=forms.TextInput(attrs={
-            'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
-            'placeholder': 'Complainant\'s occupation'
-        })
-    )
-
+            'invalid': 'Occupation is invalid.'},
+        widget=forms.TextInput(attrs={'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
+            'placeholder': 'Complainant\'s occupation'}))
     def clean_complainant_occupation(self):
         complainant_occupation = self.cleaned_data.get('complainant_occupation')
         if not complainant_occupation:
             raise forms.ValidationError("Complainant occupation cannot be empty.")
-        elif not re.match(r'^[\w\s-]*$', complainant_occupation):  # Allow letters, numbers, and common characters for occupations
+        elif not re.match(r'^[\w\s-]*$', complainant_occupation):
             raise forms.ValidationError("Enter a valid occupation.")
         return complainant_occupation
 
-
-    complainant_date_of_birth = forms.DateField(
-        label="Complainant Date of Birth",
-        required=True,
-        error_messages={
-            'required': 'Date of birth is required.'
-        },
-        widget=forms.DateInput(
-            attrs={
-                'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
-                'type': 'date',  # Sets the input type to date
-                'placeholder': 'YYYY-MM-DD'  # Placeholder for the input
-            }
-        )
-    )
-
+    complainant_date_of_birth = forms.DateField(label="Complainant Date of Birth", required=True, error_messages={'required': 'Date of birth is required.'},
+        widget=forms.DateInput(attrs={
+            'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
+            'type': 'date',
+            'placeholder': 'YYYY-MM-DD',
+            'id': 'id_complainant_date_of_birth'}))
     def clean_complainant_date_of_birth(self):
         complainant_date_of_birth = self.cleaned_data.get('complainant_date_of_birth')
         if not complainant_date_of_birth:
             raise forms.ValidationError("Date of birth cannot be empty.")
         return complainant_date_of_birth
 
+    complainant_gender = forms.ChoiceField(
+        label="Complainant Gender",
+        choices=Case.GENDER_CHOICES,
+        required=True,
+        error_messages={'required': 'Complainant Gender Is Missing.'},
+        widget=forms.Select(attrs={'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500'}))
+    def clean_complainant_gender(self):
+        complainant_gender = self.cleaned_data.get('complainant_gender')
+        if not complainant_gender:
+            raise forms.ValidationError("Complainant Gender cannot be empty.")
+        return complainant_gender
+
+    """ End of complainant information section"""
+
+
+
+    """suspect information section"""
 
     suspect_name = forms.CharField(
-        label="Suspect Name",
-        max_length=100,
-        error_messages={
-            'required': 'Suspect name is required.',
-            'invalid': 'Suspect name is invalid.'
-        },
-        widget=forms.TextInput(
-            attrs={
-                'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
-                'placeholder': 'Suspect\'s name'
-            }
-        )
-    )
-
+        label="Suspect Name", max_length=100, error_messages={'required': 'Suspect name is required.', 'invalid': 'Suspect name is invalid.'},
+        widget=forms.TextInput(attrs={'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500','placeholder': 'Suspect\'s name'}))
     def clean_suspect_name(self):
         suspect_name = self.cleaned_data.get('suspect_name')
         if not suspect_name:
@@ -390,89 +331,50 @@ class CaseStep1Form(forms.Form):
             raise forms.ValidationError("Enter a valid name (letters and spaces only).")
         return suspect_name
 
-
   
-    suspect_contact = forms.CharField(
-        label="Suspect Contact",
-        max_length=15,
-        required=True,
-        widget=forms.TextInput(
-            attrs={
+    suspect_contact = forms.CharField(label="Suspect Contact", max_length=15, required=True, widget=forms.TextInput(attrs={
                 'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
                 'placeholder': 'e.g., +1234567890'
-            }
-        ),
-        error_messages={
-            'required': 'Phone number is required.',
-            'invalid': 'Phone number is invalid.'
-        }
-    )
-
+            }),error_messages={
+            'required': 'Suspect Phone number is required.',
+            'invalid': 'Suspect Phone number is invalid.'})
     def clean_suspect_contact(self):
         suspect_contact = self.cleaned_data.get('suspect_contact')
         phone_pattern = re.compile(r'^\+?\d{7,15}$')
         if not phone_pattern.match(suspect_contact):
-            raise forms.ValidationError("Enter a valid phone number with 7 to 15 digits.")
+            raise forms.ValidationError("Enter a valid phone number of 10 digits.")
         return suspect_contact
 
-    suspect_physical_address = forms.CharField(
-        label="Suspect Physical Address",
-        max_length=250,
-        required=True,
-        widget=forms.TextInput(
-            attrs={
-                'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
-                'placeholder': 'suspect\'s physical address'
-            }
-        ),
-        error_messages={
-            'required': 'Physical address is required.',
-            'invalid': 'Physical address is invalid.'
-        }
-    )
 
-    def clean_suspect_physical_address(self):
-        suspect_physical_address = self.cleaned_data.get('suspect_physical_address')
-        if not suspect_physical_address:
+    suspect_address = forms.CharField(label="Suspect Address", max_length=250, required=True, widget=forms.TextInput(attrs={
+        'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500', 'placeholder': 'suspect\'s address'
+            }),error_messages={
+            'required': 'Suspect address is required.',
+            'invalid': 'Suspect address is invalid.'})
+    def clean_suspect_address(self):
+        suspect_address = self.cleaned_data.get('suspect_address')
+        if not suspect_address:
             raise forms.ValidationError("Physical address cannot be empty.")
-        return suspect_physical_address
+        return suspect_address
 
-    suspect_digital_address = forms.CharField(
-        label="Suspect Digital Address",
-        max_length=100,
-        required=True,
-        widget=forms.TextInput(
+    suspect_identification_card = forms.CharField(label="suspect Identification Card", max_length=100, required=True, widget=forms.TextInput(
             attrs={
                 'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
-                'placeholder': 'suspect\'s digital address'
-            }),
-        error_messages={
-            'required': 'Digital address is required.',
-            'invalid': 'Digital address is invalid.'
-        }
-    )
+                'placeholder': 'suspect\'s Identification No.'}),
+        error_messages={'required': 'suspect_identification_card No. is required.','invalid': 'identification_card is invalid.'})
 
-    def clean_suspect_digital_address(self):
-        suspect_digital_address = self.cleaned_data.get('suspect_digital_address')
-        if not suspect_digital_address:
-            raise forms.ValidationError("Digital address cannot be empty.")
-        return suspect_digital_address
+    def clean_suspect_identification_card(self):
+        suspect_identification_card = self.cleaned_data.get('suspect_identification_card')
+        if not suspect_identification_card:
+            raise forms.ValidationError("suspect_identification_card cannot be empty.")
+        return suspect_identification_card
 
-    suspect_occupation = forms.CharField(
-        label="Suspect Occupation",
-        max_length=100,
-        required=True,
-        widget=forms.TextInput(
-            attrs={
-                'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
-                'placeholder': 'suspect\'s occupation'
-            }
-        ),
+    suspect_occupation = forms.CharField(label="Suspect Occupation", max_length=100, required=True, widget=forms.TextInput(
+            attrs={'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500','placeholder': 'suspect\'s occupation'}),
         error_messages={
             'required': 'Occupation is required.',
             'invalid': 'Occupation is invalid.'
-        }
-    )
+        })
 
     def clean_suspect_occupation(self):
         suspect_occupation = self.cleaned_data.get('suspect_occupation')
@@ -483,29 +385,111 @@ class CaseStep1Form(forms.Form):
         return suspect_occupation
 
     suspect_date_of_birth = forms.DateField(
-        label="Suspect Date of Birth",
-        required=True,
-        widget=forms.DateInput(
-            attrs={
-                'type': 'date',
+        label="Suspect Date of Birth",required=True, widget=forms.DateInput( attrs={'type': 'date',
                 'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
                 'placeholder': 'YYYY-MM-DD'
-            }
-        ),
-        error_messages={
-            'required': 'Date of birth is required.'
-        }
-    )
-
+            }),error_messages={'required': 'Date of birth is required.'})
     def clean_suspect_date_of_birth(self):
         suspect_date_of_birth = self.cleaned_data.get('suspect_date_of_birth')
         if not suspect_date_of_birth:
             raise forms.ValidationError("Date of birth cannot be empty.")
         return suspect_date_of_birth
+    
 
+    suspect_gender = forms.ChoiceField(
+    label="Suspect Gender",
+    choices=Case.GENDER_CHOICES,
+    required=True,
+    error_messages={'required': 'Suspect Gender Is Missing.'},
+    widget=forms.Select(attrs={'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500'}))
+    def clean_suspect_gender(self):
+        suspect_gender = self.cleaned_data.get('suspect_gender')
+        if not suspect_gender:
+            raise forms.ValidationError("Suspect Gender can't be empty.")
+        return suspect_gender
+
+
+    """End of suspect_ information section"""
+
+
+
+    """Victim Information Form"""  
     is_victim_same_as_complainant = forms.BooleanField(
         label="Is Victim Same as Complainant?",
         required=False
+    )
+
+    victim_name = forms.CharField(
+        label="Victim Name", 
+        max_length=100, 
+        widget=forms.TextInput(attrs={
+            'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
+            'placeholder': 'Victim\'s name'
+        }),
+        error_messages={'required': 'Victim name is required.'}
+    )
+
+    victim_contact = forms.CharField(
+        label="Victim Contact", 
+        max_length=15, 
+        required=True, 
+        widget=forms.TextInput(attrs={
+            'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
+            'placeholder': 'e.g., +1234567890'
+        }),
+        error_messages={'required': 'Phone number is required.'}
+    )
+
+    victim_address = forms.CharField(
+        label="Victim Address", 
+        max_length=250, 
+        required=True, 
+        widget=forms.TextInput(attrs={
+            'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
+            'placeholder': 'Victim address'
+        }),
+        error_messages={'required': 'Victim address is required.'}
+    )
+
+    victim_identification_card = forms.CharField(
+        label="Victim Identification Card", 
+        max_length=100, 
+        required=True, 
+        widget=forms.TextInput(attrs={
+            'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
+            'placeholder': 'Victim Identification No'
+        }),
+        error_messages={'required': 'Victim Identification No is required.'}
+    )
+
+    victim_occupation = forms.CharField(
+        label="Victim Occupation", 
+        max_length=100, 
+        required=True, 
+        widget=forms.TextInput(attrs={
+            'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
+            'placeholder': 'Victim Occupation'
+        }),
+        error_messages={'required': 'Occupation is required.'}
+    )
+
+    victim_date_of_birth = forms.DateField(
+        label="Victim Date of Birth", 
+        required=True, 
+        widget=forms.DateInput(attrs={
+            'type': 'date',
+            'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
+            'placeholder': 'YYYY-MM-DD'
+        }),
+        error_messages={'required': 'Date of birth is required.'}
+    )
+
+    victim_gender = forms.ChoiceField(
+        label="Victim Gender", 
+        choices=Case.GENDER_CHOICES, 
+        required=True, 
+        error_messages={'required': 'Victim gender is required.'},
+        widget=forms.Select(attrs={'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500'})
     )
 
     def clean(self):
@@ -513,135 +497,66 @@ class CaseStep1Form(forms.Form):
         is_victim_same_as_complainant = cleaned_data.get('is_victim_same_as_complainant')
 
         if is_victim_same_as_complainant:
-            # Copy complainant data to victim fields
-            cleaned_data['victim_name'] = cleaned_data.get('complainant_name')
-            cleaned_data['victim_address'] = cleaned_data.get('complainant_address')
-        return cleaned_data
+            # Copy complainant data to victim fields if checkbox is checked
+            complainant_name = cleaned_data.get('complainant_name')
+            complainant_address = cleaned_data.get('complainant_address')
+            complainant_contact = cleaned_data.get('complainant_contact')
+            complainant_identification_card = cleaned_data.get('complainant_identification_card')
+            complainant_occupation = cleaned_data.get('complainant_occupation')
+            complainant_date_of_birth = cleaned_data.get('complainant_date_of_birth')
+            complainant_gender = cleaned_data.get('complainant_gender')
 
-    victim_name = forms.CharField(
-        label="Victim Name",
-        max_length=100,
-        widget=forms.TextInput(
-            attrs={
-                'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
-                'placeholder': 'victim\'s name'
-            }
-        ),
-        error_messages={
-            'required': 'Victim name is required.'
-        }
-    )
+            if complainant_name:
+                cleaned_data['victim_name'] = complainant_name
+            if complainant_address:
+                cleaned_data['victim_address'] = complainant_address
+            if complainant_contact:
+                cleaned_data['victim_contact'] = complainant_contact
+            if complainant_identification_card:
+                cleaned_data['victim_identification_card'] = complainant_identification_card
+            if complainant_occupation:
+                cleaned_data['victim_occupation'] = complainant_occupation
+            if complainant_date_of_birth:
+                cleaned_data['victim_date_of_birth'] = complainant_date_of_birth
+            if complainant_gender:
+                cleaned_data['victim_gender'] = complainant_gender
+
+        return cleaned_data
 
     def clean_victim_name(self):
         victim_name = self.cleaned_data.get('victim_name')
         if not victim_name:
             raise forms.ValidationError("Victim name cannot be empty.")
-        elif not re.match(r'^[a-zA-Z ]*$', victim_name):  # Allow spaces in names
+        elif not re.match(r'^[a-zA-Z ]*$', victim_name):
             raise forms.ValidationError("Enter a valid name (letters and spaces only).")
         return victim_name
-
-    victim_contact = forms.CharField(
-        label="Victim Contact",
-        max_length=15,
-        required=True,
-        widget=forms.TextInput(
-            attrs={
-                'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
-                'placeholder': 'e.g., +1234567890'
-            }
-        ),
-        error_messages={
-            'required': 'Phone number is required.'
-        }
-    )
 
     def clean_victim_contact(self):
         victim_contact = self.cleaned_data.get('victim_contact')
         phone_pattern = re.compile(r'^\+?\d{7,15}$')
         if not phone_pattern.match(victim_contact):
-            raise forms.ValidationError("Enter a valid phone number with 7 to 15 digits.")
+            raise forms.ValidationError("Enter a valid phone number.")
         return victim_contact
 
-    victim_physical_address = forms.CharField(
-        label="Victim Physical Address",
-        max_length=250,
-        required=True,
-        widget=forms.TextInput(
-            attrs={
-                'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
-                'placeholder': 'Enter physical address'
-            }
-        ),
-        error_messages={
-            'required': 'Physical address is required.'
-        }
-    )
+    def clean_victim_address(self):
+        victim_address = self.cleaned_data.get('victim_address')
+        if not victim_address:
+            raise forms.ValidationError("Victim address cannot be empty.")
+        return victim_address
 
-    def clean_victim_physical_address(self):
-        victim_physical_address = self.cleaned_data.get('victim_physical_address')
-        if not victim_physical_address:
-            raise forms.ValidationError("Physical address cannot be empty.")
-        return victim_physical_address
-
-    victim_digital_address = forms.CharField(
-        label="Victim Digital Address",
-        max_length=100,
-        required=True,
-        widget=forms.TextInput(
-            attrs={
-                'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
-                'placeholder': 'digital address'
-            }),
-        error_messages={'required': 'Digital address is required.'}
-    )
-
-    def clean_victim_digital_address(self):
-        victim_digital_address = self.cleaned_data.get('victim_digital_address')
-        if not victim_digital_address:
-            raise forms.ValidationError("Digital address cannot be empty.")
-        return victim_digital_address
-
-
-    
-    victim_occupation = forms.CharField(
-        label="Victim Occupation",
-        max_length=100,
-        required=True,
-        widget=forms.TextInput(
-            attrs={
-                'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
-                'placeholder': 'victim occupation'
-            }
-        ),
-        error_messages={
-            'required': 'Occupation is required.'
-        }
-    )
+    def clean_victim_identification_card(self):
+        victim_identification_card = self.cleaned_data.get('victim_identification_card')
+        if not victim_identification_card:
+            raise forms.ValidationError("Victim Identification Card No cannot be empty.")
+        return victim_identification_card
 
     def clean_victim_occupation(self):
         victim_occupation = self.cleaned_data.get('victim_occupation')
-        print(f"Validating victim occupation: '{victim_occupation}'")  # Debugging line
         if not victim_occupation:
             raise forms.ValidationError("Occupation cannot be empty.")
-        elif not re.match(r'^[a-zA-Z ]*$', victim_occupation):  # Allow spaces in occupations
+        elif not re.match(r'^[a-zA-Z ]*$', victim_occupation):
             raise forms.ValidationError("Enter a valid occupation (letters and spaces only).")
         return victim_occupation
-
-
-    victim_date_of_birth = forms.DateField(
-        label="Victim Date of Birth",
-        required=True,
-        widget=forms.DateInput(
-            attrs={
-                'type': 'date',
-                'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
-                'placeholder': 'YYYY-MM-DD'
-            }
-        ),
-        error_messages={
-            'required': 'Date of birth is required.'
-        }
-    )
 
     def clean_victim_date_of_birth(self):
         victim_date_of_birth = self.cleaned_data.get('victim_date_of_birth')
@@ -649,20 +564,26 @@ class CaseStep1Form(forms.Form):
             raise forms.ValidationError("Date of birth cannot be empty.")
         return victim_date_of_birth
 
+    def clean_victim_gender(self):
+        victim_gender = self.cleaned_data.get('victim_gender')
+        if not victim_gender:
+            raise forms.ValidationError("Victim gender cannot be empty.")
+        return victim_gender
+    """End of Victim Section"""
+
+
+
+    """Start if Incident Section"""
     location_of_incident = forms.CharField(
         label="Location of Incident",
         max_length=255,
         required=True,
-        widget=forms.TextInput(
-            attrs={
+        widget=forms.TextInput(attrs={
                 'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
                 'placeholder': 'Enter the location of the incident'
-            }
-        ),
+            }),
         error_messages={
-            'required': 'Location of the incident is required.'
-        }
-    )
+            'required': 'Location of the incident is required.'})
 
     def clean_location_of_incident(self):
         location_of_incident = self.cleaned_data.get('location_of_incident')
@@ -705,21 +626,21 @@ class CaseStep1Form(forms.Form):
             attrs={
                 'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
                 'placeholder': 'Describe the incident in detail',
-                'rows': 5
-            }
-        ),
+                'rows': 5 }),
         required=True,
-        error_messages={
-            'required': 'Statement of the incident is required.'
-        }
-    )
+        error_messages={'required': 'Statement of the incident is required.'})
 
     def clean_statement_of_incident(self):
         statement_of_incident = self.cleaned_data.get('statement_of_incident')
         if not statement_of_incident:
             raise forms.ValidationError("Statement of the incident cannot be empty.")
         return statement_of_incident
+    
+    """End of Incident Section"""
 
+
+
+    """Start of Key Witness Section"""
     key_witness_name = forms.CharField(
         label="Key Witness Name",
         max_length=255,
@@ -727,13 +648,10 @@ class CaseStep1Form(forms.Form):
         widget=forms.TextInput(
             attrs={
                 'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
-                'placeholder': 'Enter key witness name'
-            }
-        ),
+                'placeholder': 'Enter key witness name'}),
         error_messages={
             'invalid': 'Enter a valid witness name.'
-        }
-    )
+        })
 
     def clean_key_witness_name(self):
         key_witness_name = self.cleaned_data.get('key_witness_name')
@@ -763,46 +681,52 @@ class CaseStep1Form(forms.Form):
                 raise forms.ValidationError("Enter a valid phone number with 7 to 15 digits.")
         return key_witness_contact
 
-    key_witness_physical_address = forms.CharField(
-        label="Key Witness Physical Address",
+    key_witness_address = forms.CharField(
+        label="Key Witness Address",
         max_length=255,
         required=False,
         widget=forms.TextInput(
             attrs={
                 'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
-                'placeholder': 'Enter the physical address'
-            }
-        ),
-        error_messages={
-            'invalid': 'Enter a valid physical address.'
-        })
-
-    def clean_key_witness_physical_address(self):
-        key_witness_physical_address = self.cleaned_data.get('key_witness_physical_address')
-        if key_witness_physical_address and not re.match(r'^[a-zA-Z0-9\s,]*$', key_witness_physical_address):
-            raise forms.ValidationError("Physical address should only contain letters, numbers, spaces, and commas.")
-        return key_witness_physical_address
-
-    key_witness_digital_address = forms.CharField(
-        label="Key Witness Digital Address",
-        max_length=255,
-        required=False,
-        widget=forms.TextInput(
-            attrs={
-                'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
-                'placeholder': 'Enter the digital address'
+                'placeholder': 'Key Witness Address'
             }),
-        error_messages={
-            'invalid': 'Enter a valid digital address.'
-        })
+        error_messages={'invalid': 'Enter a valid address.'})
 
-    def clean_key_witness_digital_address(self):
-        key_witness_digital_address = self.cleaned_data.get('key_witness_digital_address')
-        if key_witness_digital_address and not re.match(r'^[a-zA-Z0-9\s,]*$', key_witness_digital_address):
-            raise forms.ValidationError("Digital address should only contain letters, numbers, spaces, and commas.")
-        return key_witness_digital_address
+    def clean_key_witness_address(self):
+        key_witness_address = self.cleaned_data.get('key_witness_address')
+        if key_witness_address and not re.match(r'^[a-zA-Z0-9\s,]*$', key_witness_address):
+            raise forms.ValidationError("Address should only contain letters, numbers, spaces, and commas.")
+        return key_witness_address
+
+    key_witness_identification_card = forms.CharField(
+        label="Key Witness Identification No",
+        max_length=255,
+        required=False,
+        widget=forms.TextInput(
+            attrs={'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
+                'placeholder': 'Key Witness Identification No.'}),
+        error_messages={'invalid': 'Enter a valid identification number.'})
+
+    def clean_key_witness_identification_card(self):
+        key_witness_identification_card = self.cleaned_data.get('key_witness_identification_card')
+        if key_witness_identification_card and not re.match(r'^[a-zA-Z0-9\s,]*$', key_witness_identification_card):
+            raise forms.ValidationError("Identification number should only contain letters, numbers, spaces, and commas.")
+        return key_witness_identification_card
     
 
+    key_witness_gender = forms.ChoiceField(
+        label="Key Witness Gender",
+        choices=Case.GENDER_CHOICES,
+        required=True,
+        error_messages={'required': 'Key Witness Gender is required.'},
+        widget=forms.Select(attrs={'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500'}))
+    def clean_key_witness_gender(self):
+        key_witness_gender = self.cleaned_data.get('key_witness_gender')
+        if not key_witness_gender:
+            raise forms.ValidationError("Key Witness gender cannot be empty.")
+        return key_witness_gender
+
+    """End of Key Witness Section"""
 
 
 class CaseStep2Form(forms.Form):
@@ -854,6 +778,7 @@ class CaseStep2Form(forms.Form):
         error_messages={'required': 'Witness statement is required.'}
     )
     
+
     def clean_key_witness_statement(self):
         key_witness_statement = self.cleaned_data.get('key_witness_statement')
         if not key_witness_statement.strip():
@@ -861,24 +786,24 @@ class CaseStep2Form(forms.Form):
         return key_witness_statement
 
 
-    # additional_witnesses = forms.CharField(
-    #     label="Additional Witnesses",
-    #     widget=forms.Textarea(
-    #         attrs={
-    #             'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
-    #             'placeholder': 'Describe the incident in detail',
-    #             'rows': 5
-    #         }
-    #     ),
-    #     required=False
-    # )
+    additional_witnesses = forms.CharField(
+        label="Additional Witnesses",
+        widget=forms.Textarea(
+            attrs={
+                'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
+                'placeholder': 'Describe the incident in detail',
+                'rows': 5
+            }
+        ),
+        required=False
+    )
 
-    # def clean_additional_witnesses(self):
-    #     additional_witnesses = self.cleaned_data.get('additional_witnesses')
-    #     # Example of additional validation: limit length of additional witnesses text
-    #     if additional_witnesses and len(additional_witnesses) > 1000:
-    #         raise forms.ValidationError("Additional witnesses information is too long.")
-    #     return additional_witnesses
+    def clean_additional_witnesses(self):
+        additional_witnesses = self.cleaned_data.get('additional_witnesses')
+        # Example of additional validation: limit length of additional witnesses text
+        if additional_witnesses and len(additional_witnesses) > 1000:
+            raise forms.ValidationError("Additional witnesses information is too long.")
+        return additional_witnesses
 
 
 
@@ -888,51 +813,51 @@ class CaseStep3Form(forms.Form):
         label="Reporting Officer Name", max_length=250, required=True,
         error_messages={'required': 'Reporting officer name is required.'}
     )
-    # def clean_reporting_officer_name(self):
-    #     reporting_officer_name = self.cleaned_data.get('reporting_officer_name')
-    #     if not reporting_officer_name:
-    #         raise forms.ValidationError("Reporting officer name cannot be empty.")
-    #     return reporting_officer_name
+    def clean_reporting_officer_name(self):
+        reporting_officer_name = self.cleaned_data.get('reporting_officer_name')
+        if not reporting_officer_name:
+            raise forms.ValidationError("Reporting officer name cannot be empty.")
+        return reporting_officer_name
 
     reporting_officer_badge_id = forms.CharField(
         label="Badge ID", max_length=50, required=True,
         error_messages={'required': 'Badge ID is required.'}
     )
-    # def clean_reporting_officer_badge_id(self):
-    #     reporting_officer_badge_id = self.cleaned_data.get('reporting_officer_badge_id')
-    #     if not reporting_officer_badge_id:
-    #         raise forms.ValidationError("Badge ID cannot be empty.")
-    #     return reporting_officer_badge_id
+    def clean_reporting_officer_badge_id(self):
+        reporting_officer_badge_id = self.cleaned_data.get('reporting_officer_badge_id')
+        if not reporting_officer_badge_id:
+            raise forms.ValidationError("Badge ID cannot be empty.")
+        return reporting_officer_badge_id
 
     reporting_officer_rank = forms.CharField(
         label="Rank", max_length=100, required=True,
         error_messages={'required': 'Rank is required.'}
     )
-    # def clean_reporting_officer_rank(self):
-    #     reporting_officer_rank = self.cleaned_data.get('reporting_officer_rank')
-    #     if not reporting_officer_rank:
-    #         raise forms.ValidationError("Rank cannot be empty.")
-    #     return reporting_officer_rank
+    def clean_reporting_officer_rank(self):
+        reporting_officer_rank = self.cleaned_data.get('reporting_officer_rank')
+        if not reporting_officer_rank:
+            raise forms.ValidationError("Rank cannot be empty.")
+        return reporting_officer_rank
 
     reporting_officer_station = forms.CharField(
         label="Station", max_length=250, required=True,
         error_messages={'required': 'Station is required.'}
     )
-    # def clean_reporting_officer_station(self):
-    #     reporting_officer_station = self.cleaned_data.get('reporting_officer_station')
-    #     if not reporting_officer_station:
-    #         raise forms.ValidationError("Station cannot be empty.")
-    #     return reporting_officer_station
+    def clean_reporting_officer_station(self):
+        reporting_officer_station = self.cleaned_data.get('reporting_officer_station')
+        if not reporting_officer_station:
+            raise forms.ValidationError("Station cannot be empty.")
+        return reporting_officer_station
 
     reporting_officer_division = forms.CharField(
         label="Division", max_length=250, required=True,
         error_messages={'required': 'Division is required.'}
     )
-    # def clean_reporting_officer_division(self):
-    #     reporting_officer_division = self.cleaned_data.get('reporting_officer_division')
-    #     if not reporting_officer_division:
-    #         raise forms.ValidationError("Division cannot be empty.")
-    #     return reporting_officer_division
+    def clean_reporting_officer_division(self):
+        reporting_officer_division = self.cleaned_data.get('reporting_officer_division')
+        if not reporting_officer_division:
+            raise forms.ValidationError("Division cannot be empty.")
+        return reporting_officer_division
 
     charges_filed = forms.CharField(
         label="Charges Filed",
@@ -940,11 +865,11 @@ class CaseStep3Form(forms.Form):
         required=True,
         error_messages={'required': 'Charges filed are required.'}
     )
-    # def clean_charges_filed(self):
-    #     charges_filed = self.cleaned_data.get('charges_filed')
-    #     if not charges_filed:
-    #         raise forms.ValidationError("Charges filed cannot be empty.")
-    #     return charges_filed
+    def clean_charges_filed(self):
+        charges_filed = self.cleaned_data.get('charges_filed')
+        if not charges_filed:
+            raise forms.ValidationError("Charges filed cannot be empty.")
+        return charges_filed
 
     legal_actions_taken = forms.CharField(
         label="Legal Actions Taken",
@@ -952,58 +877,58 @@ class CaseStep3Form(forms.Form):
         required=True,
         error_messages={'required': 'Legal actions taken are required.'}
     )
-    # def clean_legal_actions_taken(self):
-    #     legal_actions_taken = self.cleaned_data.get('legal_actions_taken')
-    #     if not legal_actions_taken:
-    #         raise forms.ValidationError("Legal actions taken cannot be empty.")
-    #     return legal_actions_taken
+    def clean_legal_actions_taken(self):
+        legal_actions_taken = self.cleaned_data.get('legal_actions_taken')
+        if not legal_actions_taken:
+            raise forms.ValidationError("Legal actions taken cannot be empty.")
+        return legal_actions_taken
 
     assigned_investigator = forms.CharField(
         label="Assigned Investigator", max_length=250, required=True,
         error_messages={'required': 'Assigned investigator is required.'}
     )
-    # def clean_assigned_investigator(self):
-    #     assigned_investigator = self.cleaned_data.get('assigned_investigator')
-    #     if not assigned_investigator:
-    #         raise forms.ValidationError("Assigned investigator cannot be empty.")
-    #     return assigned_investigator
+    def clean_assigned_investigator(self):
+        assigned_investigator = self.cleaned_data.get('assigned_investigator')
+        if not assigned_investigator:
+            raise forms.ValidationError("Assigned investigator cannot be empty.")
+        return assigned_investigator
 
     case_status = forms.CharField(
         label="Case Status", max_length=100, required=True,
         error_messages={'required': 'Case status is required.'}
     )
-    # def clean_case_status(self):
-    #     case_status = self.cleaned_data.get('case_status')
-    #     if not case_status:
-    #         raise forms.ValidationError("Case status cannot be empty.")
-    #     return case_status
+    def clean_case_status(self):
+        case_status = self.cleaned_data.get('case_status')
+        if not case_status:
+            raise forms.ValidationError("Case status cannot be empty.")
+        return case_status
 
     follow_up_required = forms.BooleanField(
         label="Follow-Up Required", required=False
     )
 
-    # additional_notes = forms.CharField(
-    #     label="Additional Notes",
-    #     widget=forms.Textarea(),  # Add parentheses here as well
-    #     required=False
-    # )
+    additional_notes = forms.CharField(
+        label="Additional Notes",
+        widget=forms.Textarea(),  # Add parentheses here as well
+        required=False
+    )
 
     mugshot = forms.ImageField(
         label="Mugshot", required=True,
         error_messages={'required': 'Mugshot is required.'}
     )
-    # def clean_mugshot(self):
-    #     mugshot = self.cleaned_data.get('mugshot')
-    #     if mugshot and not mugshot.content_type.startswith('image/'):
-    #         raise forms.ValidationError("Mugshot must be an image file.")
-    #     return mugshot
+    def clean_mugshot(self):
+        mugshot = self.cleaned_data.get('mugshot')
+        if mugshot and not mugshot.content_type.startswith('image/'):
+            raise forms.ValidationError("Mugshot must be an image file.")
+        return mugshot
 
     fingerprint = forms.FileField(
         label="Fingerprint", required=True,
         error_messages={'required': 'Fingerprint is required.'}
     )
-    # def clean_fingerprint(self):
-    #     fingerprint = self.cleaned_data.get('fingerprint')
-    #     if fingerprint and fingerprint.content_type not in ['image/png', 'image/jpeg']:
-    #         raise forms.ValidationError("Fingerprint must be a PNG or JPEG file.")
-    #     return fingerprint
+    def clean_fingerprint(self):
+        fingerprint = self.cleaned_data.get('fingerprint')
+        if fingerprint and fingerprint.content_type not in ['image/png', 'image/jpeg']:
+            raise forms.ValidationError("Fingerprint must be a PNG or JPEG file.")
+        return fingerprint

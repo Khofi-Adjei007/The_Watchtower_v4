@@ -37,3 +37,6 @@ def calculate_age(birth_date):
     else:
         return 'N/A'
 
+@register.filter(name='add_class')
+def add_class(field, css_class):
+    return field.as_widget(attrs={"class": css_class})

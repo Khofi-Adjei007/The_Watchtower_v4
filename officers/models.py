@@ -176,6 +176,16 @@ class NewOfficerRegistration(models.Model):
 
 
 class Case(models.Model):
+
+    # Gender Choices
+    GENDER_CHOICES_MALE = 'M'
+    GENDER_CHOICES_FEMALE = 'F'
+
+    GENDER_CHOICES = [
+        (GENDER_CHOICES_MALE, 'Male'),
+        (GENDER_CHOICES_FEMALE, 'Female'),
+    ]
+
     # Case Information
     case_ID = models.CharField(max_length=255)
     Case_Title = models.CharField(max_length=255)
@@ -185,27 +195,32 @@ class Case(models.Model):
     # Complainant Information
     complainant_name = models.CharField(max_length=255)
     complainant_contact = models.CharField(max_length=20)
-    complainant_physical_address = models.CharField(max_length=255)
-    complainant_digital_address = models.CharField(max_length=255, blank=True, null=True)
+    complainant_address = models.CharField(max_length=255)
+    complainant_identification_card = models.CharField(max_length=255, blank=True, null=True)
     complainant_occupation = models.CharField(max_length=100, blank=True, null=True)
     complainant_date_of_birth = models.DateField(blank=True, null=True)
+    complainant_gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True, null=True)
+
 
     # Suspect Information
     suspect_name = models.CharField(max_length=255, blank=True, null=True)
     suspect_contact = models.CharField(max_length=20, blank=True, null=True)
-    suspect_physical_address = models.CharField(max_length=255, blank=True, null=True)
-    suspect_digital_address = models.CharField(max_length=255, blank=True, null=True)
+    suspect_address = models.CharField(max_length=255, blank=True, null=True)
+    suspect_identification_card = models.CharField(max_length=255, blank=True, null=True)
     suspect_occupation = models.CharField(max_length=100, blank=True, null=True)
     suspect_date_of_birth = models.DateField(blank=True, null=True)
+    suspect_gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True, null=True)
+
 
     # Victim Information
     is_victim_same_as_complainant = models.BooleanField(default=True)
     victim_name = models.CharField(max_length=255, blank=True, null=True)
     victim_contact = models.CharField(max_length=20, blank=True, null=True)
-    victim_physical_address = models.CharField(max_length=255, blank=True, null=True)
-    victim_digital_address = models.CharField(max_length=255, blank=True, null=True)
+    victim_address = models.CharField(max_length=255, blank=True, null=True)
+    victim_identification_card = models.CharField(max_length=255, blank=True, null=True)
     victim_occupation = models.CharField(max_length=100, blank=True, null=True)
     victim_date_of_birth = models.DateField(blank=True, null=True)
+    victim_gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True, null=True)
 
     # Incident Details
     location_of_incident = models.CharField(max_length=255)
@@ -220,14 +235,18 @@ class Case(models.Model):
     # Key Witness Information
     key_witness_name = models.CharField(max_length=255, blank=True, null=True)
     key_witness_contact = models.CharField(max_length=20, blank=True, null=True)
-    key_witness_physical_address = models.CharField(max_length=255, blank=True, null=True)
-    key_witness_digital_address = models.CharField(max_length=255, blank=True, null=True)
+    key_witness_address = models.CharField(max_length=255, blank=True, null=True)
+    key_witness_identification_card = models.CharField(max_length=255, blank=True, null=True)
+    key_witness_occupation = models.CharField(max_length=100, blank=True, null=True)
+    key_witness_gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True, null=True)
+ 
     
 
     # Step 2 Fields: Statements and Additional Witnesses
     complainant_statement = models.TextField(blank=False, null=False)
     suspect_statement = models.TextField(blank=False, null=False)
     key_witness_statement = models.TextField(blank=False, null=False)
+    
 
     # Step 3 Fields: Reporting Officer and Case Progression
     reporting_officer_name = models.CharField(max_length=255, blank=True, null=True)
@@ -251,5 +270,5 @@ class Case(models.Model):
     fingerprint = models.FileField(upload_to='fingerprints/', blank=True, null=True)
 
     def __str__(self):
-        return self.case_title
+        return self.Case_Title
 
