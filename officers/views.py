@@ -6,9 +6,13 @@ import logging
 from io import BytesIO
 import logging
 import logging
+from xhtml2pdf import pisa
 logger = logging.getLogger(__name__)
 from django.contrib.auth.decorators import login_required
 from datetime import datetime
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+import io
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
@@ -34,6 +38,8 @@ from .forms_and_validations import officerRegistrationsForms, officer_loginForms
 from .templatetags.custom_filters import calculate_age
 from .models import Case
 from .pdf_generator import generate_pdf
+
+
 
 
 # Redirection Message after succcesful registrations
@@ -188,30 +194,100 @@ def verify_badge(request):
 
     
 
+def generate_case_pdf(case_data):
+    buffer = io.BytesIO()
+    p = canvas.Canvas(buffer, pagesize=letter)
+    p.setTitle("Case Docket")
+
+    # Title
+    p.setFont("Helvetica-Bold", 16)
+    p.drawString(100, 750, f"Case Docket: {case_data.get('Initial_Case_Title', '')}")
+
+    # Complainant Details
+    p.setFont("Helvetica-Bold", 14)
+    p.drawString(100, 720, "Complainant Details:")
+    p.setFont("Helvetica", 12)
+    p.drawString(120, 700, f"Name: {case_data.get('complainant_name', '')}")
+    p.drawString(120, 680, f"Contact: {case_data.get('complainant_contact', '')}")
+    p.drawString(120, 660, f"Address: {case_data.get('complainant_address', '')}")
+    p.drawString(120, 640, f"ID Card: {case_data.get('complainant_identification_card', '')}")
+    p.drawString(120, 620, f"Occupation: {case_data.get('complainant_occupation', '')}")
+    p.drawString(120, 600, f"Date of Birth: {case_data.get('complainant_date_of_birth', '')}")
+    p.drawString(120, 580, f"Gender: {case_data.get('complainant_gender', '')}")
+
+    # Suspect Details
+    p.setFont("Helvetica-Bold", 14)
+    p.drawString(100, 550, "Suspect Details:")
+    p.setFont("Helvetica", 12)
+    p.drawString(120, 530, f"Name: {case_data.get('suspect_name', '')}")
+    p.drawString(120, 510, f"Contact: {case_data.get('suspect_contact', '')}")
+    p.drawString(120, 490, f"Address: {case_data.get('suspect_address', '')}")
+    p.drawString(120, 470, f"ID Card: {case_data.get('suspect_identification_card', '')}")
+    p.drawString(120, 450, f"Occupation: {case_data.get('suspect_occupation', '')}")
+    p.drawString(120, 430, f"Date of Birth: {case_data.get('suspect_date_of_birth', '')}")
+    p.drawString(120, 410, f"Gender: {case_data.get('suspect_gender', '')}")
+
+    # Victim Details (if not the same as complainant)
+    if not case_data.get('is_victim_same_as_complainant', True):
+        p.setFont("Helvetica-Bold", 14)
+        p.drawString(100, 380, "Victim Details:")
+        p.setFont("Helvetica", 12)
+        p.drawString(120, 360, f"Name: {case_data.get('victim_name', '')}")
+        p.drawString(120, 340, f"Contact: {case_data.get('victim_contact', '')}")
+        p.drawString(120, 320, f"Address: {case_data.get('victim_address', '')}")
+        p.drawString(120, 300, f"ID Card: {case_data.get('victim_identification_card', '')}")
+        p.drawString(120, 280, f"Occupation: {case_data.get('victim_occupation', '')}")
+        p.drawString(120, 260, f"Date of Birth: {case_data.get('victim_date_of_birth', '')}")
+        p.drawString(120, 240, f"Gender: {case_data.get('victim_gender', '')}")
+
+    # Incident Details
+    p.setFont("Helvetica-Bold", 14)
+    p.drawString(100, 210, "Incident Details:")
+    p.setFont("Helvetica", 12)
+    p.drawString(120, 190, f"Location: {case_data.get('location_of_incident', '')}")
+    p.drawString(120, 170, f"Type: {case_data.get('type_of_incident', '')}")
+    p.drawString(120, 150, f"Statement: {case_data.get('statement_of_incident', '')}")
+
+    # Key Witness Details
+    p.setFont("Helvetica-Bold", 14)
+    p.drawString(100, 120, "Key Witness Details:")
+    p.setFont("Helvetica", 12)
+    p.drawString(120, 100, f"Name: {case_data.get('key_witness_name', '')}")
+    p.drawString(120, 80, f"Contact: {case_data.get('key_witness_contact', '')}")
+    p.drawString(120, 60, f"Address: {case_data.get('key_witness_address', '')}")
+    p.drawString(120, 40, f"ID Card: {case_data.get('key_witness_identification_card', '')}")
+    p.drawString(120, 20, f"Gender: {case_data.get('key_witness_gender', '')}")
+
+    # Save the PDF
+    p.showPage()
+    p.save()
+
+    buffer.seek(0)
+    return buffer
 
 
+
+
+from django.http import FileResponse
+from django.shortcuts import redirect
 
 @login_required(login_url='officer_login')
 def CaseStep1View(request):
-    # Check if the case ID is already in the session
     if 'case_id' not in request.session:
         officer = NewOfficerRegistration.objects.get(user=request.user)
         station = officer.officer_current_station
         region = officer.officer_operations_region
         
-        # Generate a new case ID and store it in the session
         case_id = generate_case_id(station, region)
         request.session['case_id'] = case_id
     else:
         case_id = request.session['case_id']
 
-    # Initialize the form
     form_step1 = CaseStep1Form(request.POST or None)
 
     if request.method == 'POST' and form_step1.is_valid():
         cleaned_data = form_step1.cleaned_data
 
-        # Store form data in the session
         request.session.update({
             'Initial_Case_Title': cleaned_data['Initial_Case_Title'],
             'complainant_name': cleaned_data['complainant_name'],
@@ -250,30 +326,45 @@ def CaseStep1View(request):
                 'victim_gender': cleaned_data['victim_gender'],
             })
 
-        # Redirect to the next step
-        return redirect('CaseStep2View')
+        # Generate PDF
+        pdf_buffer = generate_case_pdf(request.session)
+
+        # Return PDF as a response
+        return FileResponse(pdf_buffer, as_attachment=True, filename='case_docket.pdf')
+
     else:
-        # Print the form errors for debugging
         print("Form is not valid. Errors:", form_step1.errors)
         messages.error(request, "Please correct the errors below.")
-
-    # Define field groups
-    complainant_fields = ['complainant_name', 'complainant_contact', 'complainant_address', 'complainant_identification_card', 'complainant_occupation', 'complainant_date_of_birth']
-    suspect_fields = ['suspect_name', 'suspect_contact', 'suspect_address', 'suspect_identification_card', 'suspect_occupation', 'suspect_date_of_birth']
-    victim_fields = ['victim_name', 'victim_contact', 'victim_address', 'victim_identification_card', 'victim_occupation', 'victim_date_of_birth']
-    incident_details_fields = ['location_of_incident', 'type_of_incident', 'statement_of_incident']
-    key_witness_fields = ['key_witness_name', 'key_witness_contact', 'key_witness_address', 'key_witness_identification_card']
 
     context = {
         'case_id': case_id,
         'form_step1': form_step1,
-        'complainant_fields': complainant_fields,
-        'suspect_fields': suspect_fields,
-        'victim_fields': victim_fields,
-        'incident_details_fields': incident_details_fields,
-        'key_witness_fields': key_witness_fields,
+        'complainant_fields': [
+            'complainant_name', 'complainant_contact', 'complainant_address',
+            'complainant_identification_card', 'complainant_occupation',
+            'complainant_date_of_birth', 'complainant_gender',
+        ],
+        'suspect_fields': [
+            'suspect_name', 'suspect_contact', 'suspect_address',
+            'suspect_identification_card', 'suspect_occupation',
+            'suspect_date_of_birth', 'suspect_gender',
+        ],
+        'victim_fields': [
+            'victim_name', 'victim_contact', 'victim_address',
+            'victim_identification_card', 'victim_occupation',
+            'victim_date_of_birth', 'victim_gender',
+        ],
+        'incident_fields': [
+            'location_of_incident', 'type_of_incident', 'statement_of_incident',
+        ],
+        'witness_fields': [
+            'key_witness_name', 'key_witness_contact', 'key_witness_address',
+            'key_witness_identification_card', 'key_witness_gender',
+        ]
     }
+
     return render(request, 'CaseStep1View.html', context)
+
 
 
 
